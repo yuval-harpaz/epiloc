@@ -1,5 +1,9 @@
 nPNT=642;
-cd /home/yuval/Data/marik/som2/1
+try
+    cd /home/yuval/Data/marik/som2/1
+catch
+    cd /home/oshrit/MyDocuments/DATA/epiloc/data
+end
 hs=ft_read_headshape('hs_file');
 hs=hs.pnt*1000;
 
