@@ -220,3 +220,26 @@ scatter3(pnt(maxPNT,1),pnt(maxPNT,2),pnt(maxPNT,3),30,0)
 
 [~,sortPNT]=sort(Pow1,'descend');
 sortPNT(1:5)
+
+
+%%
+load avgFilt % filtered data 1-20 Hz
+[dataF, ~]=marikViUnite(avg1_footL,avg2_footL,avg3_footL);
+sampInt=180;
+nPNT=642;
+nHeadPos=3;
+nPerm=1000;
+N_sources=5;
+R_pow=10;
+normalization_flag=1;
+dipoleCrowds('/home/oshrit/MyDocuments/DATA/som2/', dataF, sampInt, nPNT, nHeadPos, nPerm, N_sources, R_pow, normalization_flag)
+
+load avgFilt % filtered data 1-20 Hz
+sampInt=180;
+nPNT=642;
+nHeadPos=1;
+nPerm=1000;
+N_sources=5;
+R_pow=10;
+normalization_flag=1;
+dipoleCrowds('/home/oshrit/MyDocuments/DATA/som2/', avg1_footL, sampInt, nPNT, nHeadPos, nPerm, N_sources, R_pow, normalization_flag)
