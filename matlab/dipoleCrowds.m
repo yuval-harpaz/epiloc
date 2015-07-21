@@ -148,12 +148,12 @@ for permi=1:nPerm
     Ran=ran(1:N_sources);
     srcPerm=false(length(gain)/2,1);
     srcPerm(Ran)=true;
-    Gain=gain(:,[srcPerm;srcPerm]);
+    Gain=gain(:,[srcPerm,srcPerm]);
     source=Gain\M; % left divide source localization
     recon=Gain*source; % recounstruction
     R=corr(recon,M).^R_pow; % Goodness of fit of reciunstracted vs. Meassured (Original - unite)
     pow=zeros(size(Pow));
-    pow([srcPerm;srcPerm])=source*R;
+    pow([srcPerm,srcPerm])=source*R;
     Pow=Pow+pow;
     prog(permi)
 end
