@@ -43,11 +43,11 @@ LF1.inside(nPNT*2+1:nPNT*3)=lf2.inside;
 LF1.inside=LF1.inside(ini);
 
 
-close all
-figure
-plot3pnt(hs,'.')
-hold on
-plot3pnt(pnt,'.k')
+% close all
+% figure
+% plot3pnt(hs,'.')
+% hold on
+% plot3pnt(pnt,'.k')
 
 
 
@@ -63,9 +63,9 @@ cd /home/yuval/Data/marik/som2
 load avgFilt avg1_footL avg1_handR
 
 MH=avg1_handR.avg(:,138);
-MF=avg1_footL.avg(:,180);
-MHF=MH+MF;%*2.5;
-topoplot248(MHF(1:248))
+% MF=avg1_footL.avg(:,180);
+% MHF=MH+MF;%*2.5;
+% topoplot248(MHF(1:248))
 
 
 %% hand
@@ -104,6 +104,7 @@ sortPNT(1:5)
 pos=pnt(sortPNT(1),:);
 % ori=pnt_complex(sortPNT(1),:,2);
 % pnt_complex(
+cd 1
 if exist('ori.mat','file')
     load ori
     load LF
@@ -139,15 +140,15 @@ tic
 for permi=1:100000
     Ran=[];
     [~,Ran]=sort(rand(1,srcN));
-    Ran=Ran(1);
+    Ran=Ran(1:3);
     srcPerm=false(1,srcN);
     srcPerm(Ran)=true;
     Gain=gain(:,srcPerm);
     source=Gain\MH;
     recon=Gain*source;
-    R=corr(recon,MH).^2;
+    R=corr(recon,MH).^100;
     pow=zeros(size(Pow));
-    pow(srcPerm)=R;%source*R;
+    pow(srcPerm)=source*R;
     Pow=Pow+pow;
     prog(permi)
 end
