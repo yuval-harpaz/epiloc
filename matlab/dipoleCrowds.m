@@ -35,6 +35,9 @@ function dipoleCrowds(Data_path, data, sampInt, nPNT, nHeadPos, nPerm, N_sources
 % normalization_flag=1;
 % dipoleCrowds('/home/oshrit/MyDocuments/DATA/som2/', avg1_footL, sampInt, nPNT, nHeadPos, nPerm, N_sources, R_pow, normalization_flag)
 
+% on yuval's computer
+% load /home/yuval/Data/marik/som2/avgFilt.mat avg1_handR
+% dipoleCrowds('/home/yuval/Data/marik/som2', avg1_handR, 138, 642, 1,10000, 10, 100);
 eval(['cd ', Data_path]);
 
 cd ('./1');

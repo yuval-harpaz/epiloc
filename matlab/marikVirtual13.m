@@ -110,7 +110,7 @@ if exist('ori.mat','file')
     load LF
 else
     
-    fwd=mne_read_forward_solution('MNE/pos1_raw-oct-6-fwd.fif');
+    fwd=mne_read_forward_solution('/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif');
     cd 1
     cfg=[];
     cfg.fileName='/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif';
@@ -160,24 +160,36 @@ scatter3pnt(srcPos,10,abs(Pow))
 hold on
 scatter3pnt(hs,1,'k')
 
-mm=gain'*MH;
+mm=abs(gain'*MH);
 figure;
-scatter3pnt(srcPos,10,abs(mm))
+scatter3pnt(srcPos,10,mm)
 hold on
 scatter3pnt(hs,1,'k')
 
 
 
-Pow1=zeros(length(LF.pos),1);
-Pow1(srci)=abs(Pow);
-figure;
-scatter3pnt(LF.pos,25,Pow1)
-[~,maxPNT]=max(Pow1);
-hold on
-scatter3(LF.pos(maxPNT,1),LF.pos(maxPNT,2),LF.pos(maxPNT,3),30,0)
-
-[~,sortPNT]=sort(Pow1,'descend');
-sortPNT(1:5)
+% Pow1=zeros(length(LF.pos),1);
+% Pow1(srci)=abs(Pow);
+% figure;
+% scatter3pnt(LF.pos,25,Pow1)
+% [~,maxPNT]=max(Pow1);
+% hold on
+% scatter3(LF.pos(maxPNT,1),LF.pos(maxPNT,2),LF.pos(maxPNT,3),30,0)
+% 
+% [~,sortPNT]=sort(Pow1,'descend');
+% sortPNT(1:5)
+fwd=mne_read_forward_solution('/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif');
+nL=fwd.src(1).np;
+nR=fwd.src(2).np;
+src=zeros(nL+nR,1);
+src(srci)=mm;
+srcMultL(1:nL)=src(1:nL);
+srcMultR(1:nR)=src(nL+1:end);
+src=zeros(nL+nR,1);
+src(srci)=Pow;
+srcL(1:nL)=src(1:nL);
+srcR(1:nR)=src(nL+1:end);
+save src srcL srcR srcMu*
 
 
 
