@@ -67,11 +67,11 @@ MH=avg1_handR.avg(:,138);
 % MHF=MH+MF;%*2.5;
 % topoplot248(MHF(1:248))
 
-
 %% hand
+N=10000;
 Pow=zeros(length(gain),1);
 tic
-for permi=1:100000
+for permi=1:N
     Ran=[];
     
     [~,ran]=sort(rand(1,length(gain)/2));
@@ -100,26 +100,141 @@ scatter3(pnt(maxPNT,1),pnt(maxPNT,2),pnt(maxPNT,3),30,0)
 [~,sortPNT]=sort(Pow1,'descend');
 sortPNT(1:5)
 
+%% depth bias
+
+Ninv=1000;
+Nfwd=1000;
+Ndip=3;
+
+Pow=zeros(length(gain),1);
+tic
+for fwdi=1:Nfwd
+    Mrand=zeros(248,1);
+    for dipi=1:Ndip
+        Ran=[];
+        [~,Ran]=max(rand(1,length(gain)/2));
+        %Ran=ran(1);
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        GainFwd=gain(:,[srcPerm,srcPerm]);
+        randOri=rand(1);
+        randOri(2,1)=sqrt(1-randOri^2);
+        randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
+        Mrand=Mrand+GainFwd*randOri;
+    end
+    for invi=1:Ninv
+        Ran=[];
+        [~,ran]=sort(rand(1,length(gain)/2));
+        Ran=ran(1:10);
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        Gain=gain(:,[srcPerm,srcPerm]);
+        source=Gain\Mrand;
+        recon=Gain*source;
+        R=corr(recon,Mrand).^100;
+        pow=zeros(size(Pow));
+        pow([srcPerm,srcPerm])=source*R;
+        Pow=Pow+pow;
+    end
+    prog(fwdi)
+end
+toc
+
+PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+eval(['PowRand',num2str(Ndip),'=PowRand;']);
+figure;
+scatter3pnt(pnt,25,PowRand)
+%% moment = 1
+
+Ninv=1000;
+Nfwd=1000;
+Ndip=3;
+
+Pow=zeros(length(gain),1);
+tic
+for fwdi=1:Nfwd
+    Mrand=zeros(248,1);
+    Ran=[];
+    [~,ran]=sort(rand(1,length(gain)));
+    Ran=ran(1:Ndip);
+    srcPerm=false(1,length(gain));
+    srcPerm(Ran)=true;
+    GainFwd=gain(:,srcPerm);
+    Mrand=sum(GainFwd,2);
+
+    for invi=1:Ninv
+        Ran=[];
+        [~,ran]=sort(rand(1,length(gain)/2));
+        Ran=ran(1:10);
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        Gain=gain(:,[srcPerm,srcPerm]);
+        source=Gain\Mrand;
+        recon=Gain*source;
+        R=corr(recon,Mrand).^100;
+        pow=zeros(size(Pow));
+        pow([srcPerm,srcPerm])=source*R;
+        Pow=Pow+pow;
+    end
+    prog(fwdi)
+end
+toc
+
+PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+%eval(['PowRand',num2str(Ndip),'=PowRand;']);
+figure;
+scatter3pnt(pnt,25,PowRand)
+
+%% foot
+load avgFilt avg1_footL
+
+MF=avg1_footL.avg(:,180);
+% MF=avg1_footL.avg(:,180);
+% MHF=MH+MF;%*2.5;
+% topoplot248(MHF(1:248))
+
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\MF;
+    recon=Gain*source;
+    R=corr(recon,MF).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+toc
+Pow1=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+figure;
+scatter3pnt(pnt,25,Pow1)
+[~,maxPNT]=max(Pow1);
+hold on
+scatter3(pnt(maxPNT,1),pnt(maxPNT,2),pnt(maxPNT,3),30,0)
+
+[~,sortPNT]=sort(Pow1,'descend');
+sortPNT(1:5)
+
+figure;
+scatter3pnt(pnt,25,Pow1./PowRand)
 %% anatomy - Hand
-pos=pnt(sortPNT(1),:);
+% pntA=3834;
+% pos=pnt(pntA);
 % ori=pnt_complex(sortPNT(1),:,2);
 % pnt_complex(
 cd 1
-if exist('ori.mat','file')
-    load ori
+
     load LF
-else
-    
-    fwd=mne_read_forward_solution('/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif');
-    cd 1
-    cfg=[];
-    cfg.fileName='/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif';
-    cfg.subset=false;
-    [Grid,ftLeadfield,ori]=fs2grid(cfg);
-    save ori ori
-    LF=ft_convert_units(ftLeadfield,'mm')
-    save LF LF
-end
 
 % figure;
 % plot3pnt(hs,'.k')
@@ -164,35 +279,8 @@ mm=abs(gain'*MH);
 figure;
 scatter3pnt(srcPos,10,mm)
 hold on
+scatter3pnt(pnt(sortPNT(1:2),:),25,'c')
 scatter3pnt(hs,1,'k')
-
-
-
-% Pow1=zeros(length(LF.pos),1);
-% Pow1(srci)=abs(Pow);
-% figure;
-% scatter3pnt(LF.pos,25,Pow1)
-% [~,maxPNT]=max(Pow1);
-% hold on
-% scatter3(LF.pos(maxPNT,1),LF.pos(maxPNT,2),LF.pos(maxPNT,3),30,0)
-% 
-% [~,sortPNT]=sort(Pow1,'descend');
-% sortPNT(1:5)
-fwd=mne_read_forward_solution('/home/yuval/Data/marik/som2/MNE/pos1_raw-oct-6-fwd.fif');
-nL=fwd.src(1).np;
-nR=fwd.src(2).np;
-src=zeros(nL+nR,1);
-src(srci)=mm;
-srcMultL(1:nL)=src(1:nL);
-srcMultR(1:nR)=src(nL+1:end);
-src=zeros(nL+nR,1);
-src(srci)=Pow;
-srcL(1:nL)=src(1:nL);
-srcR(1:nR)=src(nL+1:end);
-save src srcL srcR srcMu*
-
-
-
 
 
 
