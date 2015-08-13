@@ -1,7 +1,7 @@
 
 nPNT=642;
 try
-    cd /home/yuval/Data/marik/som2/1
+    cd /home/yuval/Data/marik/som2/2
 catch
     cd /home/oshrit/MyDocuments/DATA/epiloc/data
 end
@@ -60,9 +60,9 @@ for pnti=1:length(pnt)
 end
 
 cd /home/yuval/Data/marik/som2
-load avgFilt avg1_handR
+load avgFilt avg2_handR
 
-MH=avg1_handR.avg(:,138);
+MH=avg2_handR.avg(:,138);
 % MF=avg1_footL.avg(:,180);
 % MHF=MH+MF;%*2.5;
 % topoplot248(MHF(1:248))
@@ -102,9 +102,9 @@ sortPNT(1:5)
 
 %% depth bias
 
-Ninv=1000;
+Ninv=100;
 Nfwd=1000;
-Ndip=3;
+Ndip=20;
 
 Pow=zeros(length(gain),1);
 tic
@@ -146,9 +146,9 @@ figure;
 scatter3pnt(pnt,25,PowRand)
 %% moment = 1
 
-Ninv=100;
-Nfwd=100;
-Ndip=920;
+Ninv=1000;
+Nfwd=1000;
+Ndip=20;
 
 Pow=zeros(length(gain),1);
 tic
@@ -160,7 +160,10 @@ for fwdi=1:Nfwd
     srcPerm=false(1,length(gain));
     srcPerm(Ran)=true;
     GainFwd=gain(:,srcPerm);
-    Mrand=sum(GainFwd,2);
+    randOri=rand(1,Ndip);
+    randOri=randOri<0.5;
+    randOri=(randOri-0.5)*2;
+    Mrand=sum(GainFwd.*repmat(randOri,248,1),2);
 
     for invi=1:Ninv
         Ran=[];
