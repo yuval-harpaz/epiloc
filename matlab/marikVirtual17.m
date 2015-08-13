@@ -2,8 +2,9 @@
 nPNT=642;
 try
     cd /home/yuval/Data/marik/som2/2
-catch
-    cd /home/oshrit/MyDocuments/DATA/epiloc/data
+catch err
+    cd /home/oshrit/MyDocuments/DATA/som2/2
+%     cd /home/oshrit/MyDocuments/DATA/epiloc/data
 end
 hs=ft_read_headshape('hs_file');
 hs=hs.pnt*1000;
@@ -59,7 +60,11 @@ for pnti=1:length(pnt)
     gain(1:248,length(pnt)+pnti)=dip;
 end
 
-cd /home/yuval/Data/marik/som2
+try
+    cd /home/yuval/Data/marik/som2
+catch err
+    cd /home/oshrit/MyDocuments/DATA/som2
+end
 load avgFilt avg2_handR
 
 MH=avg2_handR.avg(:,138);
@@ -118,6 +123,8 @@ for fwdi=1:Nfwd
         srcPerm(Ran)=true;
         GainFwd=gain(:,[srcPerm,srcPerm]);
         randOri=rand(1);
+        % here we randomly select a direction that does not have to be one
+        % of the tan axes. 
         randOri(2,1)=sqrt(1-randOri^2);
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
         Mrand=Mrand+GainFwd*randOri;
@@ -144,6 +151,8 @@ PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
 eval(['PowRand',num2str(Ndip),'=PowRand;']);
 figure;
 scatter3pnt(pnt,25,PowRand)
+
+
 %% moment = 1
 
 Ninv=1000;
@@ -158,11 +167,13 @@ for fwdi=1:Nfwd
     [~,ran]=sort(rand(1,length(gain)));
     Ran=ran(1:Ndip);
     srcPerm=false(1,length(gain));
+    % here we randomly select in one of the tan axes
     srcPerm(Ran)=true;
     GainFwd=gain(:,srcPerm);
     randOri=rand(1,Ndip);
+    % could be positive or negative
     randOri=randOri<0.5;
-    randOri=(randOri-0.5)*2;
+    randOri=(randOri-0.5)*2; % coorecting bias to include -1
     Mrand=sum(GainFwd.*repmat(randOri,248,1),2);
 
     for invi=1:Ninv
@@ -187,8 +198,11 @@ PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
 %eval(['PowRand',num2str(Ndip),'=PowRand;']);
 figure;
 scatter3pnt(pnt,25,PowRand)
+%% Normalizing the solution by calculated bias
 figure;
 scatter3pnt(pnt,25,Pow1./PowRand)
+
+
 %% foot
 load avgFilt avg1_footL
 
