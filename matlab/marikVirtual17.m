@@ -187,7 +187,8 @@ PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
 %eval(['PowRand',num2str(Ndip),'=PowRand;']);
 figure;
 scatter3pnt(pnt,25,PowRand)
-
+figure;
+scatter3pnt(pnt,25,Pow1./PowRand)
 %% foot
 load avgFilt avg1_footL
 
