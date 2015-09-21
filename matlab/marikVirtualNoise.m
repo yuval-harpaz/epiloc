@@ -1,12 +1,20 @@
 
 nPNT=642;
-try
-    cd /home/yuval/Data/marik/som2/2
-catch
-    cd /home/oshrit/MyDocuments/DATA/epiloc/data
-end
+load('bias_f1000_i10000_d300.mat')
+load('pnt1pos.mat')
+cd /home/yuval/Data/marik/som2
+cd 1
 hs=ft_read_headshape('hs_file');
 hs=hs.pnt*1000;
+hdr=ft_read_header(source);
+
+o=fitsphere(hs);
+dist=sqrt(sum(power(pnt-repmat(o,length(pnt),1),2),2));
+corr(dist,PowRand);
+
+o=fitsphere(hdr.grad.chanpos(1:248,:))*1000;
+dist=sqrt(sum(power(pnt-repmat(o,length(pnt),1),2),2));
+corr(dist,PowRand);
 
 inward=[10 20 30];
 
@@ -102,10 +110,10 @@ sortPNT(1:5)
 
 %% depth bias
 
-Ninv=1000;
-Nfwd=100;
+Ninv=100000;
+Nfwd=1000;
 Ndip=20;
-NdipInv=10;%Ndip; % 10
+
 Pow=zeros(length(gain),1);
 tic
 for fwdi=1:Nfwd
@@ -122,11 +130,10 @@ for fwdi=1:Nfwd
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
         Mrand=Mrand+GainFwd*randOri;
     end
-    %disp('done fwd')
     for invi=1:Ninv
         Ran=[];
         [~,ran]=sort(rand(1,length(gain)/2));
-        Ran=ran(1:NdipInv);
+        Ran=ran(1:10);
         srcPerm=false(1,length(gain)/2);
         srcPerm(Ran)=true;
         Gain=gain(:,[srcPerm,srcPerm]);
@@ -144,35 +151,19 @@ toc
 
     
 PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
-%save (['bias_f',num2str(Nfwd),'_i',num2str(Ninv),'_d',num2str(Ndip)],'PowRand')
+save (['bias_f',num2str(Nfwd),'_i',num2str(Ninv),'_d',num2str(Ndip)],'PowRand')
 %eval(['PowRand',num2str(Ndip),'=PowRand;']);
 figure;
 scatter3pnt(pnt,25,PowRand)
 
 figure;
 scatter3pnt(pnt,25,Pow1./PowRand)
-
-%% uniform depth bias
-cd /home/yuval/Data/marik/som2
-load Pow1
-load('pnt1pos.mat')
-load('bias_f1000_i100000_d300.mat')
-load o
-dist=sqrt(sum([(pnt-repmat(o,length(pnt),1)).^2]')');
-dist1=dist<70;dist3=dist>85;dist2=dist>70;dist2(dist>85)=false;
-coef=zeros(920,1);
-coef(dist1)=mean(dist(dist1));
-coef(dist2)=mean(dist(dist2));
-coef(dist3)=mean(dist(dist3));
-figure;scatter3pnt(pnt,25,PowRand)
-figure;scatter3pnt(pnt,25,Pow1./coef)
-
 %% moment = 1
 
 Ninv=1000;
-Nfwd=100;
+Nfwd=1000;
 Ndip=20;
-NdipInv=10;%Ndip; % 10
+
 Pow=zeros(length(gain),1);
 tic
 for fwdi=1:Nfwd
@@ -191,7 +182,7 @@ for fwdi=1:Nfwd
     for invi=1:Ninv
         Ran=[];
         [~,ran]=sort(rand(1,length(gain)/2));
-        Ran=ran(1:NdipInv);
+        Ran=ran(1:10);
         srcPerm=false(1,length(gain)/2);
         srcPerm(Ran)=true;
         Gain=gain(:,[srcPerm,srcPerm]);
@@ -262,8 +253,7 @@ scatter3pnt(pnt,25,Pow1./PowRand)
 cd 1
 
     load LF
-[~,sortPNT]=sort(Pow1,'descend');    
-pos=pnt(sortPNT(1),:);
+
 % figure;
 % plot3pnt(hs,'.k')
 % hold on
