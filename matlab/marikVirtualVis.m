@@ -131,7 +131,7 @@ toc
 
 
     
-PowRand=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+PowRand=sqrt(Pow(1:mid).^2+Pow(mid+1:mid*2).^2);
 %save (['bias_f',num2str(Nfwd),'_i',num2str(Ninv),'_d',num2str(Ndip)],'PowRand')
 %eval(['PowRand',num2str(Ndip),'=PowRand;']);
 figure;
@@ -140,3 +140,17 @@ scatter3pnt(pnt,25,PowRand)
 figure;
 scatter3pnt(pnt,25,Pow1./PowRand)
 
+PowRandSmoo=zeros(size(PowRand));
+for pnti=1:mid
+    neib=sqrt(sum(power(pnt-repmat(pnt(pnti,:),mid,1),2),2))<20;
+    neib(layer~=layer(pnti))=false;
+%     figure;
+%     plot3pnt(pnt,'k.')
+%     hold on
+%     plot3pnt(pnt(neib,:),'xg')
+%     plot3pnt(pnt(pnti,:),'or')
+    PowRandSmoo(pnti)=median(PowRand(neib));
+end
+
+figure;
+scatter3pnt(pnt,25,Pow1./PowRandSmoo)
