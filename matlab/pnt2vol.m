@@ -35,19 +35,41 @@ if exist('test+orig.BRIK','file')
 end
 WriteBrik (VV, infoNew, OptTSOut);
 VV=zeros(256,256,256);
+dist=20;
 for i=1:256
     for j=1:256
-        for ki=1:256
-            neib=find(sqrt(sum(power(repmat([i,j,k],920,1)-vox,2),2))<20);
-            if isempty(neib)
+        for k=1:256
+            neib=find(sqrt(sum(power(repmat([i,j,k],920,1)-vox,2),2))<dist); % look for neighbouring pnt
+            if isempty(neib) % no pnt near by
                 VV(i,j,k)=0;
             else
-                neibijk=vox(neib,:);
-                neibv=Pow1(neib);
-                disp(['[i j k v] = ',num2str([i,j,k,length(neibv)])])
+                neibdist=sqrt(sum(power(repmat([i,j,k],size(neib,1),1)-vox(neib,:),2),2));
+                gotpnt=find(neibdist==0);
+                if ~isempty(gotpnt) % one of the voxels has pnt in it
+                    VV(i,j,k)=Pow1(neib(gotpnt));
+                else
+                    if size(neib,1)==2
+                        neibv=Pow1(neib);
+                        %disp(['[i j k size] = ',num2str([i,j,k,length(neibv)])])
+                        neibv(3)=0;
+                        neibdist(3)=dist;
+                    elseif size(neib,1)==1
+                        neibv=Pow1(neib);
+                        %disp(['[i j k size] = ',num2str([i,j,k,length(neibv)])])
+                        neibv(2:3)=0;
+                        neibdist(2:3)=dist;
+                    else
+                        neibv=Pow1(neib);
+                    end
+                    ratio=neibdist./sum(neibdist);
+                    ratio=1./ratio;
+                    ratio=ratio.^3;
+                    ratio=ratio./sum(ratio);
+                    VV(i,j,k)=sum(ratio.*neibv);
+                end
             end
         end
     end
-    disp(['slice ',num2str(i),])
+    disp(['done slice ',num2str(i),])
 end
                 
