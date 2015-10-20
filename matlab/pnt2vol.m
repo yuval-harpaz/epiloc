@@ -1,39 +1,29 @@
-cd /home/yuval/Data/marik/som2/1
-[V,info]=BrikLoad('ortho+orig');
+function e(pnt,Pow,prefix)
+% takes pnt (n by 3) + Pow (n by 1) and saves in BRIK format, got to have
+% ortho+orig.BRIK in currecnt directory
 
-% 0 0 0 = 127 180 127
-% info.ORIGIN [-127,180,127]
-% info.DELTA 1    -1    -1
-% give x y z in RAI order and get ijk (in ASL order)
+if exist('ortho+orig.BRIK','file')
+    [~,info]=BrikLoad('ortho+orig');
+else
+    error('no ortho file here')
+end
+if ~exist('prefix','var')
+    prefix='test';
+end
 
-[~,w]=unix('~/SAM_BIU/docs/coordstoijk.csh ortho+orig 1 2 3 > zero'); % 129 177 126
 vox=zeros(length(pnt),3);
 for pnti=1:length(pnt)
     [~,w]=unix(['~/SAM_BIU/docs/coordstoijk.csh ortho+orig ',num2str(pnt(pnti,2)),' ',num2str(-pnt(pnti,1)),' ',num2str(pnt(pnti,3)),' > vox']); % 129 177 126
     vox(pnti,1:3)=importdata('vox');
     prog(pnti)
 end
-% M=importdata('ijkmat.1D');
-% x=1;
-% y=2;
-% z=3;
-% 
-% X=sum(M(:,1)*x)+
 
-
-VV=zeros(256,256,256);
-for pnti=1:920
-    VV(vox(pnti,1),vox(pnti,2),vox(pnti,3))=Pow1(pnti); % ASL order, see output of 3dinfo ortho+orig
-end
 OptTSOut.Scale = 1;
-OptTSOut.Prefix = 'test';
+OptTSOut.Prefix = prefix;
 OptTSOut.verbose = 1;
 infoNew = info;
 infoNew.TAGSET_LABELS='Nasion~Left Ear~Right Ear';
-if exist('test+orig.BRIK','file')
-    eval('!rm test+orig*')
-end
-WriteBrik (VV, infoNew, OptTSOut);
+
 VV=zeros(256,256,256);
 dist=20;
 for i=1:256
@@ -46,24 +36,24 @@ for i=1:256
                 neibdist=sqrt(sum(power(repmat([i,j,k],size(neib,1),1)-vox(neib,:),2),2));
                 gotpnt=find(neibdist==0);
                 if ~isempty(gotpnt) % one of the voxels has pnt in it
-                    VV(i,j,k)=Pow1(neib(gotpnt));
+                    VV(i,j,k)=Pow(neib(gotpnt));
                 else
                     if size(neib,1)==2
-                        neibv=Pow1(neib);
+                        neibv=Pow(neib);
                         %disp(['[i j k size] = ',num2str([i,j,k,length(neibv)])])
                         neibv(3)=0;
                         neibdist(3)=dist;
                     elseif size(neib,1)==1
-                        neibv=Pow1(neib);
+                        neibv=Pow(neib);
                         %disp(['[i j k size] = ',num2str([i,j,k,length(neibv)])])
                         neibv(2:3)=0;
                         neibdist(2:3)=dist;
                     else
-                        neibv=Pow1(neib);
+                        neibv=Pow(neib);
                     end
                     ratio=neibdist./sum(neibdist);
                     ratio=1./ratio;
-                    ratio=ratio.^3;
+                    ratio=ratio.^2;
                     ratio=ratio./sum(ratio);
                     VV(i,j,k)=sum(ratio.*neibv);
                 end
@@ -72,4 +62,8 @@ for i=1:256
     end
     disp(['done slice ',num2str(i),])
 end
-                
+VV=VV.*10^13;
+if exist([prefix,'+orig.BRIK'],'file')
+    unix(['rm ',prefix,'+orig*'])
+end
+WriteBrik (VV, infoNew, OptTSOut);
