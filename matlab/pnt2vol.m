@@ -1,4 +1,4 @@
-function e(pnt,Pow,prefix)
+function pnt2vol(pnt,Pow,prefix)
 % takes pnt (n by 3) + Pow (n by 1) and saves in BRIK format, got to have
 % ortho+orig.BRIK in currecnt directory
 
