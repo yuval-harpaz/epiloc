@@ -259,3 +259,14 @@ save talk/RFL RFL
 save talk/Pow5 Pow5
 
 %% make BRIK
+cd /home/yuval/Data/marik/som2/talk
+load pnt
+load Pow4
+load Pow5
+
+cd /home/yuval/Data/marik/som2/1
+pnt2vol(pnt,Pow4,'RF');
+pnt2vol(pnt,Pow5,'RFL');
+pnt2vol(pnt,Pow1,'R');
+pnt2vol(pnt,Pow2,'L');
+pnt2vol(pnt,Pow3,'F');
