@@ -24,7 +24,7 @@ for NN=1:10
         Gain=gain(:,[srcPerm,srcPerm]);
         source=Gain\M;
         recon=Gain*source;
-        R=corr(recon,M).^10000;
+        R=corr(recon,M).^100;
         pow=zeros(size(Pow,1),1);
         pow([srcPerm,srcPerm])=source*R;
         Pow(1:length(pow),NN)=Pow(1:length(pow),NN)+pow;
@@ -51,3 +51,12 @@ maxPow=zeros(size(Pow2));
 maxPow(bigi(1:2))=1;
 figure;
 scatter3pnt(pnt,25,maxPow)
+
+gain1=gain(:,bigi(1))*Pow1(bigi(1))+gain(:,bigi(1)+length(Pow2))*Pow1(bigi(1)+length(Pow2));
+figure;topoplot248(gain1);
+gain2=gain(:,bigi(2))*Pow1(bigi(2))+gain(:,bigi(2)+length(Pow2))*Pow1(bigi(2)+length(Pow2));
+figure;topoplot248(gain2);
+source=[gain1,gain2]\M;
+fwd=[gain1,gain2]*source;
+figure; topoplot248(fwd);
+
