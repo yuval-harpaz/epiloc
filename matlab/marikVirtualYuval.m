@@ -1,5 +1,5 @@
 %% averaging odball
-cd /home/yuval/Data/marik/marikAud
+cd /home/yuval/Data/marik/yuval/4
 [events,values]=trigOnset;
 trl=events'-203;
 trl(:,2)=events'+509;
@@ -44,21 +44,26 @@ comp     = ft_componentanalysis(cfg, datacln);
 
 % remove the artifact components
 cfg = [];
-cfg.component = [1 2]; % change
+cfg.component = 6; % change
 dataica = ft_rejectcomponent(cfg, comp);
 
 cfg=[];
 cfg.method='summary';
 datafinal=ft_rejectvisual(cfg,datacln);
 
-save datafinal datafinal
+
+trl(:,4)=values;
+save trl trl
 
 for trli=1:length(datafinal.trial)
     datafinal.trialinfo(trli,1)=trl(trl(:,1)==datafinal.sampleinfo(trli,1),4);
 end
+save datafinal datafinal
+
 trlSt=find(datafinal.trialinfo==128);
 trlOdd=find(datafinal.trialinfo==64);
 choice=round(1:(485/99):485);
+choice=round(1:(length(trlSt)/length(trlOdd)):length(trlSt));
 trlSt=trlSt(choice);
 cfg=[];
 cfg.trials=trlSt;
@@ -68,10 +73,79 @@ cfg.trials=trlOdd;
 avgOdd=ft_timelockanalysis(cfg,datafinal);
 save avgSt avgSt
 save avgOdd avgOdd
+
 %% head model etc
 
-cd /home/yuval/Data/marik/marikAud
-load avg
+cd /home/yuval/Data/marik/yuval/4
+load avgOdd
+
+
+%% M150
+M=avgOdd.avg(:,390);
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\M;
+    recon=Gain*source;
+    R=corr(recon,M).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+toc
+Pow2=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
+figure;
+scatter3pnt(pnt,25,Pow2)
+hold on
+scatter3pnt(hs,5,'k')
+
+%% somato
+cd /home/yuval/Data/marik/yuval/3
+fn='xc,hb,lf_c,rfhp0.1Hz';
+cond={'handR','handL','footL'};
+for runi=1
+    %cd (num2str(runi))
+%     trig=readTrig_BIU(fn);
+%     trig=clearTrig(trig);
+    [evt,val]=trigOnset;%(trig);
+    
+    trl=evt'-103;
+    trl(:,2)=trl+410;
+    trl(:,3)=-103;
+    trl(:,4)=val;
+    cfg.trl=trl;
+    cfg.dataset=fn;
+    cfg.channel='MEG';
+    cfg.bpfilter='yes';
+    cfg.bpfreq=[1 20];
+    data=ft_preprocessing(cfg);
+    %data.trialinfo=trig(evt)';
+    %good=badTrials(data);
+    for condi=1:3
+        cfg=[];
+        cfg.trials=find(data.trialinfo==condi*2);
+        avg=ft_timelockanalysis(cfg,data);
+        eval(['avg',num2str(runi),'_',cond{condi},'=correctBL(avg,[-0.1 0]);'])
+    end
+end
+clear avg
+save avgFilt avg*
+%% dipoles
+cd /home/yuval/Data/marik/yuval/3
+load avgFilt
+LRF=[157,150,214];
+
 hs=ft_read_headshape('hs_file');
 hs=hs.pnt*1000;
 nPNT=642;
@@ -131,8 +205,9 @@ end
 % MHF=MH+MF;%*2.5;
 % topoplot248(MHF(1:248))
 
-%% M100
-M=avg.avg(:,353);
+%% right hand
+M=avg1_handR.avg(:,LRF(1));
+figure;topoplot248(M);
 N=10000;
 Pow=zeros(length(gain),1);
 tic
@@ -161,8 +236,8 @@ scatter3pnt(pnt,25,Pow1)
 hold on
 scatter3pnt(hs,5,'k')
 
-%% M150
-M=avg.avg(:,390);
+M=avg1_handL.avg(:,LRF(2));
+figure;topoplot248(M);
 N=10000;
 Pow=zeros(length(gain),1);
 tic
@@ -179,6 +254,103 @@ for permi=1:N
     source=Gain\M;
     recon=Gain*source;
     R=corr(recon,M).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+toc
+Pow1=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
+figure;
+scatter3pnt(pnt,25,Pow1)
+hold on
+scatter3pnt(hs,5,'k')
+
+M=avg1_footL.avg(:,LRF(3));
+figure;topoplot248(M);
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\M;
+    recon=Gain*source;
+    R=corr(recon,M).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+toc
+Pow1=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
+figure;
+scatter3pnt(pnt,25,Pow1)
+hold on
+scatter3pnt(hs,5,'k')
+
+%% two hands
+M=avg1_handR.avg(:,LRF(1))+avg1_handL.avg(:,LRF(2));
+figure;
+topoplot248(M);
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\M;
+    recon=Gain*source;
+    R=corr(recon,M).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+toc
+Pow1=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
+figure;
+scatter3pnt(pnt,25,Pow1)
+hold on
+scatter3pnt(hs,5,'k')
+
+
+%% aud right source?
+cd /home/yuval/Data/marik/yuval/4
+load avgOdd
+load gain
+load pnt
+M=avgOdd.avg(:,390);
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\M;
+    recon=Gain*source;
+    R=corr(recon,M).^10000;
     pow=zeros(size(Pow));
     pow([srcPerm,srcPerm])=source*R;
     Pow=Pow+pow;
@@ -188,34 +360,75 @@ toc
 Pow2=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
 figure;
 scatter3pnt(pnt,25,Pow2)
-hold on
-scatter3pnt(hs,5,'k')
+% hold on
+% scatter3pnt(hs,5,'k')
 
-M=avg.avg(:,500);
-N=10000;
-Pow=zeros(length(gain),1);
-tic
-for permi=1:N
-    Ran=[];
+%% median
+Pow=zeros(length(gain),10);
+for NN=1:10
+    N=10000;
     
-    [~,ran]=sort(rand(1,length(gain)/2));
-    selected=ran(1:10);
-    Ran=[Ran;selected];
-    
-    srcPerm=false(1,length(gain)/2);
-    srcPerm(Ran)=true;
-    Gain=gain(:,[srcPerm,srcPerm]);
-    source=Gain\M;
-    recon=Gain*source;
-    R=corr(recon,M).^100;
-    pow=zeros(size(Pow));
-    pow([srcPerm,srcPerm])=source*R;
-    Pow=Pow+pow;
-    prog(permi)
+    disp(' ')
+    disp(['round ',num2str(NN)])
+    disp(' ')
+    for permi=1:N
+        Ran=[];
+        [~,ran]=sort(rand(1,length(gain)/2));
+        selected=ran(1:10);
+        Ran=[Ran;selected];
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        Gain=gain(:,[srcPerm,srcPerm]);
+        source=Gain\M;
+        recon=Gain*source;
+        R=corr(recon,M).^1000;
+        pow=zeros(size(Pow,1),1);
+        pow([srcPerm,srcPerm])=source*R;
+        Pow(1:length(pow),NN)=Pow(1:length(pow),NN)+pow;
+        prog(permi)
+    end
 end
-toc
-Pow3=sqrt(Pow(1:length(pnt)).^2+Pow(length(pnt)+1:length(pnt)*2).^2);
+Pow1=median(Pow,2);
+Pow2=sqrt(Pow1(1:length(pnt)).^2+Pow1(length(pnt)+1:length(pnt)*2).^2);
 figure;
-scatter3pnt(pnt,25,Pow3)
-hold on
-scatter3pnt(hs,5,'k')
+scatter3pnt(pnt,25,Pow2)
+
+% hold on
+% scatter3pnt(hs,5,'k')
+
+%% median for somatosensory
+cd /home/yuval/Data/marik/yuval/3
+load avgFilt
+LRF=[157,150,214];
+load gain
+load pnt
+M=avg1_handR.avg(:,LRF(1))+avg1_handL.avg(:,LRF(2));
+
+Pow=zeros(length(gain),10);
+for NN=1:10
+    N=10000;
+    
+    disp(' ')
+    disp(['round ',num2str(NN)])
+    disp(' ')
+    for permi=1:N
+        Ran=[];
+        [~,ran]=sort(rand(1,length(gain)/2));
+        selected=ran(1:10);
+        Ran=[Ran;selected];
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        Gain=gain(:,[srcPerm,srcPerm]);
+        source=Gain\M;
+        recon=Gain*source;
+        R=corr(recon,M).^1000;
+        pow=zeros(size(Pow,1),1);
+        pow([srcPerm,srcPerm])=source*R;
+        Pow(1:length(pow),NN)=Pow(1:length(pow),NN)+pow;
+        prog(permi)
+    end
+end
+Pow1=median(Pow,2);
+Pow2=sqrt(Pow1(1:length(pnt)).^2+Pow1(length(pnt)+1:length(pnt)*2).^2);
+figure;
+scatter3pnt(pnt,25,Pow2)
