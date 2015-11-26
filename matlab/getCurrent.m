@@ -24,8 +24,8 @@ maxima=maxima(maxOrder);
 
 pp=Pow2(maxima);
 pp=pp/max(pp);
-disply([' number of local maxima found ', num2str(size(maxima,1))]);
-display(pp)
+disp([' number of local maxima found ', num2str(size(maxima,1))]);
+disp(pp)
 pnti=maxima(pp>=threshold);
 
 % right is 777, left is 757
