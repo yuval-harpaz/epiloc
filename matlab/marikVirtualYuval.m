@@ -4,6 +4,7 @@ cd /home/yuval/Data/marik/yuval/4
 trl=events'-203;
 trl(:,2)=events'+509;
 trl(:,3)=-203;
+trl(:,4)=values;
 cfg=[];
 cfg.dataset='xc,hb,lf_c,rfhp0.1Hz';
 cfg.demean='yes';
@@ -111,7 +112,7 @@ hold on
 scatter3pnt(hs,5,'k')
 
 %% somato
-cd /home/yuval/Data/marik/yuval/3
+cd /home/yuval/Data/marik/yuval/som
 fn='xc,hb,lf_c,rfhp0.1Hz';
 cond={'handR','handL','footL'};
 for runi=1
