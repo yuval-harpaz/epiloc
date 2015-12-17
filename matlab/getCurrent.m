@@ -1,10 +1,11 @@
-function [current,ori,pnti]=getCurrent(pow,pnt,M,gain)
+function [current,ori,pnti]=getCurrent(pow,pnt,M,gain, maxdist, threshold)
 
 % pow is Pow1, 2 dipoles per location
-maxdist=30;
-threshold=0.5;
+% recomended:
+% maxdist=30;
+% threshold=0.5;
 
-current=[];
+% current=[];
 %% find local maxima
 Pow2=sqrt(pow(1:length(pnt)).^2+pow(length(pnt)+1:length(pnt)*2).^2);
 maxima=false(size(Pow2));
@@ -23,7 +24,9 @@ maxima=maxima(maxOrder);
 
 pp=Pow2(maxima);
 pp=pp/max(pp);
-pnti=maxima(pp>=0.5);
+disp([' number of local maxima found ', num2str(size(maxima,1))]);
+disp(pp)
+pnti=maxima(pp>=threshold);
 
 % right is 777, left is 757
 Gain=[];

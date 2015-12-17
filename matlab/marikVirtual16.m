@@ -59,7 +59,11 @@ for pnti=1:length(pnt)
     gain(1:248,length(pnt)+pnti)=dip;
 end
 
-cd /home/yuval/Data/marik/som2
+try
+    cd /home/yuval/Data/marik/som2
+catch err
+    cd /home/oshrit/MyDocuments/DATA/som2
+end
 load avgFilt avg1_handR
 
 MH=avg1_handR.avg(:,138);
