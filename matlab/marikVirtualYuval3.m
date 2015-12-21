@@ -103,7 +103,9 @@ cd /home/yuval/Data/marik/yuval/som
 load gain
 load pnt
 load avgFilt
-RLF=[152,157,290];
+hs=ft_read_headshape('hs_file')
+hs=hs.pnt*1000;
+RLF=[152,157,300];
 M=avg1_handR.avg(:,RLF(1));
 figure;topoplot248(M);
 N=10000;
