@@ -230,7 +230,7 @@ scatter3pnt(hs,5,'k')
 
 
 %% two hands + foot
-M=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+2*avg1_footL.avg(:,RLF(3));
+M=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3));
 figure;
 topoplot248(M);
 N=10000;
