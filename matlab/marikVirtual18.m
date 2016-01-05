@@ -59,7 +59,7 @@ for pnti=1:length(pnt)
     gain(1:248,length(pnt)+pnti)=dip;
 end
 
-Ninv=10000;
+Ninv=1000;
 Nfwd=10000;
 Ndip=33;
 NdipInv=33;%Ndip; % 10

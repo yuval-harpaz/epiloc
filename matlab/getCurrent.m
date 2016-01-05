@@ -1,4 +1,4 @@
-function [current,ori,pnti]=getCurrent(pow,pnt,M,gain, maxdist, threshold)
+function [current,ori,pnti,Pow3]=getCurrent(pow,pnt,M,gain, maxdist, threshold)
 
 % pow is Pow1, 2 dipoles per location
 % recomended:
@@ -16,7 +16,6 @@ for pnti=1:length(maxima)
     if Pow2(pnti)==max(Pow2(neighb))
         maxima(pnti)=true;
     end
-
 end
 maxima = find(maxima);
 [~,maxOrder]=sort(Pow2(maxima),'descend');
@@ -55,4 +54,13 @@ scatter3pnt(pnt,25,src)
 fwd=Gain*current;
 figure; topoplot248(fwd);
 title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
-
+Pow3=zeros(size(Pow2));
+for maxi=1:length(pnti)
+    clusti=find(Pow2>Pow2(pnti(maxi)).*threshold);
+    pos=pnt(pnti(maxi),:);
+    distnc=sqrt(sum((pnt(clusti,:)-repmat(pos,length(clusti),1)).^2,2));
+    neighb=clusti(distnc<maxdist);
+    Pow3(neighb)=current(maxi);
+end
+figure;
+scatter3pnt(pnt,25,Pow3)

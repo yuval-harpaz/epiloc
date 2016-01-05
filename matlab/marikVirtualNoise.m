@@ -130,6 +130,7 @@ for fwdi=1:Nfwd
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
         Mrand=Mrand+GainFwd*randOri;
     end
+    
     for invi=1:Ninv
         Ran=[];
         [~,ran]=sort(rand(1,length(gain)/2));
@@ -145,6 +146,7 @@ for fwdi=1:Nfwd
         Pow=Pow+pow;
     end
     prog(fwdi)
+    
 end
 toc
 
