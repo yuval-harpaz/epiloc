@@ -1,13 +1,54 @@
-% sequential noise norm, no rand
+% simulate one dipole
 cd /home/yuval/Data/marik/som2/talk
 load pnt
 load gain1
 load layer
 
-%% hand R + foot
+%% simulate 
 
-load RF
-load Pow4
+layeri=find(layer==3);
+[~,ii]=sort(rand(size(layeri)));
+pnti=layeri(ii(1:4));
+PowDip=zeros(size(PowSim));
+PowDip(pnti)=1;
+figure;scatter3pnt(pnt,25,PowDip)
+
+M=gain(:,pnti);
+M=sum(M')';
+N=10000;
+Pow=zeros(length(gain),1);
+tic
+for permi=1:N
+    Ran=[];
+    [~,ran]=sort(rand(1,length(gain)/2));
+    selected=ran(1:10);
+    Ran=[Ran;selected];
+    
+    srcPerm=false(1,length(gain)/2);
+    srcPerm(Ran)=true;
+    Gain=gain(:,[srcPerm,srcPerm]);
+    source=Gain\M;
+    recon=Gain*source;
+    R=corr(recon,M).^100;
+    pow=zeros(size(Pow));
+    pow([srcPerm,srcPerm])=source*R;
+    Pow=Pow+pow;
+    prog(permi)
+end
+
+PowSim=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+
+figure;scatter3pnt(pnt,25,PowSim)
+
+load('bias_f1000_i100_d1.mat')
+
+figure;scatter3pnt(pnt,25,PowSim./PowRand)
+
+[current,ori,pnti,Pow3]=getCurrent(Pow,pnt,M,gain,30,0.3);
+[current,ori,pnti,Pow3]=getCurrent(Pow./[PowRand;PowRand],pnt,M,gain,30,0.3);
+mask=PowClust>0;
+
+
 
 %[current,ori,pnti,PowClust]=getCurrent(Pow,pnt,RF,gain,30,0.3);
 
