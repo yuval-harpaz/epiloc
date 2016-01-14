@@ -1,4 +1,4 @@
-function results=marikVirtual29
+function results=marikVirtual29(Ndip, noiseFactor)
 
 % simulate best fit, more than 2 dipoles
 
@@ -7,13 +7,13 @@ load pnt
 load gain1
 load layer
 N=10000;
-Ndip=1;
+% Ndip=1;
 %% simulate
 inputLabel='simulated points index';
 resultsLabel={'N dipoles found','N correct location','distance'};
 results=[];
 input=[];
-noiseFactor=0.3;
+% noiseFactor=0.3;
 for dermi=1:1000
     %% make simulated field
     
@@ -93,9 +93,9 @@ for dermi=1:1000
 %         length(pntAvg),sum(ismember(pntAvg,input(dermi,:))),...
 %         length(pntR),sum(ismember(pntinvR,input(dermi,:)))];
     
-    results(dermi,1:3)=getErrors(pnt,pnti,pntMed);
-    results(dermi,4:6)=getErrors(pnt,pnti,pntAvg);
-    results(dermi,7:9)=getErrors(pnt,pnti,pntR);
+    results(dermi,1:4)=getErrors(pnt,pnti,pntMed,layer);
+    results(dermi,5:8)=getErrors(pnt,pnti,pntAvg,layer);
+    results(dermi,9:12)=getErrors(pnt,pnti,pntR,layer);
     %     resultsR(dermi,1)=length(pntinvR);
     %     resultsR(dermi,2)=sum(ismember(pntMaxi,input(dermi,:)));
     %     resultsR(dermi,3)=Rmax;
@@ -114,10 +114,10 @@ for dermi=1:1000
     prog(dermi)
 end
 
-save(['results_',num2str(Ndip)],'results','input')
+save(['results_',num2str(Ndip),'_',num2str(noiseFactor)],'results','input')
 disp('done');
 marikVirtual29plot(input,pnt,results);
-function errVec=getErrors(pnt,pnti,pntX,results)
+function errVec=getErrors(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
 errVec(1)=length(pntX);
@@ -128,6 +128,7 @@ for Xi=1:length(pntX)
 end
 % find pairs of nearby sources and sum the error
 distSum=0;
+depthErr=0;
 for pairi=1:min([length(pnti),length(pntX)])
     [minD,minDi]=sort(distances(:));
     x=find(sum(distances==minD(1),1));
@@ -141,8 +142,11 @@ for pairi=1:min([length(pnti),length(pntX)])
     else
         distances(y,:)=max(minD(end));
     end
+    depthErr=depthErr+layer(pnti(x))-layer(pntX(y));
 end
+depthErr=depthErr./pairi;
 errVec(1,3)=distSum./pairi;
+errVec(1,4)=depthErr;
         
     
 % binSum=[];
