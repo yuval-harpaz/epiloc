@@ -1,4 +1,4 @@
-function results=marikVirtual29(Ndip, noiseFactor)
+function results=marikVirtual30(amp)
 
 % simulate best fit, more than 2 dipoles
 
@@ -7,13 +7,14 @@ load pnt
 load gain1
 load layer
 N=10000;
-% Ndip=1;
+Ndip=3;
 %% simulate
 inputLabel='simulated points index';
 resultsLabel={'N dipoles found','N correct location','distance'};
 results=[];
 input=[];
-% noiseFactor=0.3;
+noiseFactor=0.1;
+dipSize=[1/amp,1/amp,1];
 for dermi=1:1000
     %% make simulated field
     
@@ -23,6 +24,7 @@ for dermi=1:1000
     input(dermi,1:Ndip)=Ran;
     pnti=Ran;
     Mrand=zeros(248,1);
+    Mstd=zeros(248,1);
     for dipi=1:Ndip
         %Ran=ran(1);
         srcPerm=false(1,length(gain)/2);
@@ -31,13 +33,15 @@ for dermi=1:1000
         randOri=rand(1);
         randOri(2,1)=sqrt(1-randOri^2);
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
-        Mrand=Mrand+GainFwd*randOri;
+        Mrand=Mrand+(dipSize(dipi).*GainFwd)*randOri;
+        Mstd=Mstd+GainFwd*randOri;
     end
+    Mstd=std(Mstd);
     noise=randn(248,1);
     noise=noise./std(noise)*noiseFactor/3;
     interf=gain*randn(length(layer)*2,1);
     interf=interf./std(interf)*(2*noiseFactor/3);
-    Mrand=Mrand./std(Mrand);
+    Mrand=Mrand./Mstd;
 %     noise=noise./max(abs(noise)).*max(abs(Mrand'))*(noiseFactor/3); 
 %     interf=interf./max(abs(interf)).*max(abs(Mrand'))*(2*noiseFactor/3);
     Mrand=Mrand+noise+interf;
@@ -114,7 +118,7 @@ for dermi=1:1000
     prog(dermi)
 end
 
-save(['results_',num2str(Ndip),'_',num2str(noiseFactor)],'results','input')
+save(['results_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(amp)],'results','input')
 disp('done');
 marikVirtual29plot(input,pnt,results);
 function errVec=getErrors(pnt,pnti,pntX,layer)
