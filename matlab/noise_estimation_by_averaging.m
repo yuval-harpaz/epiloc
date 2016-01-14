@@ -195,34 +195,127 @@ M=avg2_handL_75_3.avg(:,138);
 M=avg2_footL_75_3.avg(:,180);
 M=avg2_handR_75_3.avg(:,138)+avg2_handL_75_3.avg(:,138)+avg2_footL_75_3.avg(:,180);
 
-%% 1 iteration of 10000 permutations 
-N=10000;
-Pow=zeros(length(gain),1);
-tic
-for permi=1:N
-    Ran=[];
-    [~,ran]=sort(rand(1,length(gain)/2));
-    selected=ran(1:10);
-    Ran=[Ran;selected];
+
+%% median of 10 iteration of 10000 permutations 
+Pow=zeros(length(gain),10);
+for NN=1:10
+    N=10000;
     
-    srcPerm=false(1,length(gain)/2);
-    srcPerm(Ran)=true;
-    Gain=gain(:,[srcPerm,srcPerm]);
-    source=Gain\M;
-    recon=Gain*source;
-    R=corr(recon,M).^100;
-    pow=zeros(size(Pow));
-    pow([srcPerm,srcPerm])=source*R;
-    Pow=Pow+pow;
-    prog(permi)
+    disp(' ')
+    disp(['round ',num2str(NN)])
+    disp(' ')
+    for permi=1:N
+        Ran=[];
+        [~,ran]=sort(rand(1,length(gain)/2));
+        selected=ran(1:10);
+        Ran=[Ran;selected];
+        srcPerm=false(1,length(gain)/2);
+        srcPerm(Ran)=true;
+        Gain=gain(:,[srcPerm,srcPerm]);
+        source=Gain\M;
+        recon=Gain*source;
+        R=corr(recon,M).^10;
+        pow=zeros(size(Pow,1),1);
+        pow([srcPerm,srcPerm])=source*R;
+        Pow(1:length(pow),NN)=Pow(1:length(pow),NN)+pow;
+        prog(permi)
+    end
 end
-toc
-Pow1=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+Pow1=median(Pow,2);
+Pow2=sqrt(Pow1(1:length(pnt)).^2+Pow1(length(pnt)+1:length(pnt)*2).^2);
 figure;
-scatter3pnt(pnt,25,Pow1)
-[~,maxPNT]=max(Pow1);
-hold on
-scatter3(pnt(maxPNT,1),pnt(maxPNT,2),pnt(maxPNT,3),30,0)
+scatter3pnt(pnt,25,Pow2)
+
+
+% Pow1_R_100_combined3_300trials=Pow1; 
+% save Pow1_R_100_combined3_300trials Pow1_R_100_combined3_300trials
+
+% Pow1_R_1000_combined3_300trials=Pow1; 
+% save Pow1_R_1000_combined3_300trials Pow1_R_1000_combined3_300trials
+
+% Pow1_R_10_combined3_300trials=Pow1; 
+% save Pow1_R_10_combined3_300trials Pow1_R_10_combined3_300trials
+
+%% local maxima
+% [current,ori,pnti]=getCurrent(Pow1,pnt,M,gain, maxdist, threshold);
+[current,ori,pnti]=getCurrent(Pow1_R_100_combined3_300trials,pnt,M,gain, 30, 0.5);
+[current,ori,pnti]=getCurrent(Pow1_R_100_combined3_300trials,pnt,M,gain, 30, 0.4); % !!!
+[current,ori,pnti]=getCurrent(Pow1_R_100_combined3_300trials,pnt,M,gain, 20, 0.5); 
+[current,ori,pnti]=getCurrent(Pow1_R_100_combined3_300trials,pnt,M,gain, 20, 0.4); 
+
+[current,ori,pnti]=getCurrent(Pow1_R_1000_combined3_300trials,pnt,M,gain, 30, 0.5);
+[current,ori,pnti]=getCurrent(Pow1_R_1000_combined3_300trials,pnt,M,gain, 30, 0.3); % !!!
+[current,ori,pnti]=getCurrent(Pow1_R_1000_combined3_300trials,pnt,M,gain, 20, 0.5); 
+[current,ori,pnti]=getCurrent(Pow1_R_1000_combined3_300trials,pnt,M,gain, 20, 0.3); % !!!
+
+[current,ori,pnti]=getCurrent(Pow1_R_10_combined3_300trials,pnt,M,gain, 30, 0.5); % !!!
+[current,ori,pnti]=getCurrent(Pow1_R_10_combined3_300trials,pnt,M,gain, 30, 0.4); 
+[current,ori,pnti]=getCurrent(Pow1_R_10_combined3_300trials,pnt,M,gain, 20, 0.5); 
+[current,ori,pnti]=getCurrent(Pow1_R_10_combined3_300trials,pnt,M,gain, 20, 0.3); 
+
+
+%% 1 iteration of 10000 permutations 
+% % N=10000;
+% % Pow=zeros(length(gain),1);
+% % tic
+% % for permi=1:N
+% %     Ran=[];
+% %     [~,ran]=sort(rand(1,length(gain)/2));
+% %     selected=ran(1:10);
+% %     Ran=[Ran;selected];
+% %     
+% %     srcPerm=false(1,length(gain)/2);
+% %     srcPerm(Ran)=true;
+% %     Gain=gain(:,[srcPerm,srcPerm]);
+% %     source=Gain\M;
+% %     recon=Gain*source;
+% %     R=corr(recon,M).^100;
+% %     pow=zeros(size(Pow));
+% %     pow([srcPerm,srcPerm])=source*R;
+% %     Pow=Pow+pow;
+% %     prog(permi)
+% % end
+% % toc
+% % Pow1=sqrt(Pow(1:920).^2+Pow(921:1840).^2);
+% % figure;
+% % scatter3pnt(pnt,25,Pow1)
+% % [~,maxPNT]=max(Pow1);
+% % hold on
+% % scatter3(pnt(maxPNT,1),pnt(maxPNT,2),pnt(maxPNT,3),30,0)
+
+%%     
+% % figure;
+% % plot(avg1_foot1.time,avg1_hand2.avg,'g')
+% % hold on
+% % plot(avg1_foot1.time,avg1_foot2.avg,'r')
+% % plot(avg1_foot1.time,avg1_foot1.avg,'k')
+% % legend(cond)
+% % title('position1')
+% % figure;
+% % plot(avg1_foot1.time,avg2_hand2.avg,'g')
+% % hold on
+% % plot(avg1_foot1.time,avg2_foot2.avg,'r')
+% % plot(avg1_foot1.time,avg2_foot1.avg,'k')
+% % legend(cond)
+% % title('position2')
+% % figure;
+% % plot(avg1_foot1.time,avg3_hand2.avg,'g')
+% % hold on
+% % plot(avg1_foot1.time,avg3_foot2.avg,'r')
+% % plot(avg1_foot1.time,avg3_foot1.avg,'k')
+% % legend(cond)
+% % title('position3')
+
+
+%% Yuval auditory
+
+cd /home/oshrit/MyDocuments/DATA/Marik/yuval/4
+% load Pow1000
+load pnt
+load avgOdd
+load gain
+M=avgOdd.avg(:,390);
+figure; topoplot248(M);
 
 %% median of 10 iteration of 10000 permutations 
 Pow=zeros(length(gain),10);
@@ -254,74 +347,11 @@ Pow2=sqrt(Pow1(1:length(pnt)).^2+Pow1(length(pnt)+1:length(pnt)*2).^2);
 figure;
 scatter3pnt(pnt,25,Pow2)
 
-%% local maxima
-% [current,ori,pnti]=getCurrent(Pow1,pnt,M,gain);
+[current,ori,pnti]=getCurrent(Pow1,pnt,M,gain, 30, 0.3);
 
-maxdist=20;
-threshold=0.5;
+Pow1_R_1000=Pow1;
+Pow1_R_100=Pow1;
 
-% current=[];
-%% find local maxima
-Pow2=sqrt(Pow1(1:length(pnt)).^2+Pow1(length(pnt)+1:length(pnt)*2).^2);
-maxima=false(size(Pow2));
-for pnti=1:length(maxima)
-    pos=pnt(pnti,:);
-    distnc=sqrt(sum((pnt-repmat(pos,length(pnt),1)).^2,2));
-    neighb=distnc<maxdist;
-    if Pow2(pnti)==max(Pow2(neighb))
-        maxima(pnti)=true;
-    end
-
-end
-maxima = find(maxima);
-[~,maxOrder]=sort(Pow2(maxima),'descend');
-maxima=maxima(maxOrder);
-
-pp=Pow2(maxima);
-pp=pp/max(pp);
-pnti=maxima(pp>=threshold);
-
-% right is 777, left is 757
-Gain=[];
-for maxi=1:length(pnti)
-    maxj=pnti(maxi);
-    maxk=pnti(maxi)+length(Pow2);
-    normFac=sqrt(1/((Pow1(maxj)).^2+(Pow1(maxk)).^2));
-    ori(maxi,1:2)=[Pow1(maxj)*normFac Pow1(maxk)*normFac];
-    Gain(1:248,maxi)=gain(:,maxj)*ori(maxi,1)+gain(:,maxk)*ori(maxi,2);
-end
-current=Gain\M;
-R=(corr(Gain*current,M)).^2;
-src=zeros(size(Pow2));
-src(pnti)=current;
-figure;
-scatter3pnt(pnt,25,src)
-fwd=Gain*current;
-figure; topoplot248(fwd);
-title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
-
-%%     
-% % figure;
-% % plot(avg1_foot1.time,avg1_hand2.avg,'g')
-% % hold on
-% % plot(avg1_foot1.time,avg1_foot2.avg,'r')
-% % plot(avg1_foot1.time,avg1_foot1.avg,'k')
-% % legend(cond)
-% % title('position1')
-% % figure;
-% % plot(avg1_foot1.time,avg2_hand2.avg,'g')
-% % hold on
-% % plot(avg1_foot1.time,avg2_foot2.avg,'r')
-% % plot(avg1_foot1.time,avg2_foot1.avg,'k')
-% % legend(cond)
-% % title('position2')
-% % figure;
-% % plot(avg1_foot1.time,avg3_hand2.avg,'g')
-% % hold on
-% % plot(avg1_foot1.time,avg3_foot2.avg,'r')
-% % plot(avg1_foot1.time,avg3_foot1.avg,'k')
-% % legend(cond)
-% % title('position3')
-
-
+save Pow1_R_1000 Pow1_R_1000
+save Pow1_R_100 Pow1_R_100
 
