@@ -1,12 +1,15 @@
-function [current,ori,pnti,Pow3]=getCurrent(pow,pnt,M,gain, maxdist, threshold)
+function [current,ori,pnti,Pow3]=getCurrent(pow,pnt,M,gain, maxdist, threshold, figs)
 
 % pow is Pow1, 2 dipoles per location
 % recomended:
 % maxdist=30;
 % threshold=0.5;
-
+% figs can be true or false
 % current=[];
 %% find local maxima
+if ~exist('figs','var')
+    figs=true;
+end
 Pow2=sqrt(pow(1:length(pnt)).^2+pow(length(pnt)+1:length(pnt)*2).^2);
 maxima=false(size(Pow2));
 for pnti=1:length(maxima)
@@ -23,8 +26,10 @@ maxima=maxima(maxOrder);
 
 pp=Pow2(maxima);
 pp=pp/max(pp);
-disp([' number of local maxima found ', num2str(size(maxima,1))]);
-disp(pp)
+if figs
+    disp([' number of local maxima found ', num2str(size(maxima,1))]);
+    disp(pp)
+end
 pnti=maxima(pp>=threshold);
 
 % right is 777, left is 757
@@ -49,11 +54,14 @@ current=Gain\M;
 R=(corr(Gain*current,M)).^2;
 src=zeros(size(Pow2));
 src(pnti)=current;
-figure;
-scatter3pnt(pnt,25,src)
-fwd=Gain*current;
-figure; topoplot248(fwd);
-title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
+if figs
+    figure;
+    scatter3pnt(pnt,25,src)
+    fwd=Gain*current;
+    figure;
+    topoplot248(fwd);
+    title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
+end
 Pow3=zeros(size(Pow2));
 for maxi=1:length(pnti)
     clusti=find(Pow2>Pow2(pnti(maxi)).*threshold);
@@ -62,5 +70,7 @@ for maxi=1:length(pnti)
     neighb=clusti(distnc<maxdist);
     Pow3(neighb)=current(maxi);
 end
-figure;
-scatter3pnt(pnt,25,Pow3)
+if figs
+    figure;
+    scatter3pnt(pnt,25,Pow3)
+end
