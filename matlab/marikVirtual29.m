@@ -1,8 +1,8 @@
-function results=marikVirtual29(Ndip, noiseFactor)
+function results=marikVirtual29(Ndip, noiseFactor, Rpower)
 
 % simulate best fit, more than 2 dipoles
 
-cd /home/yuval/Data/marik/som2/talk
+% cd /home/yuval/Data/marik/som2/talk
 load pnt
 load gain1
 load layer
@@ -63,7 +63,7 @@ for dermi=1:1000
             Gain=gain(:,[srcPerm,srcPerm]);
             source=Gain\Mrand;
             recon=Gain*source;
-            R=corr(recon,Mrand).^100;
+            R=corr(recon,Mrand).^Rpower;
             pow=zeros(size(Pow));
             pow([srcPerm,srcPerm])=source*R;
             Pow=Pow+pow;
@@ -114,9 +114,12 @@ for dermi=1:1000
     prog(dermi)
 end
 
-save(['results_',num2str(Ndip),'_',num2str(noiseFactor)],'results','input')
+save(['results_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor)],'results','input')
 disp('done');
-marikVirtual29plot(input,pnt,results);
+
+% marikVirtual29plot(input,pnt,results);
+
+
 function errVec=getErrors(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
