@@ -1,4 +1,4 @@
-function results=marikVirtual29(Ndip, noiseFactor, Rpower)
+function [results, Rcorr]=Simulate_tp_fn(Ndip, noiseFactor, Rpower)
 
 % simulate best fit, more than 2 dipoles
 
@@ -14,7 +14,12 @@ resultsLabel={'N dipoles found','N correct location','distance'};
 results=[];
 input=[];
 % noiseFactor=0.3;
-for dermi=1:1000
+
+der=1000;
+% R=zeros(der,Ndip);
+Rcorr=ones(Ndip,Ndip,der);
+Dist=cell(der, 3);  % 3 for 'MED', 'AVG', and 'R'
+for dermi=1:der
     %% make simulated field
     
     ran=rand(1,length(gain)/2);
@@ -31,8 +36,19 @@ for dermi=1:1000
         randOri=rand(1);
         randOri(2,1)=sqrt(1-randOri^2);
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
-        Mrand=Mrand+GainFwd*randOri;
+        Mrand_dipi(dipi)=GainFwd*randOri;
+        Mrand=Mrand+Mrand_dipi(dipi); %GainFwd*randOri;
+%         Mrecon=ori(1,:)*gain(:,[pntAvg(1),920+pntAvg(1)])';
     end
+       
+    for dipi1=1:Ndip
+        for dipi2=1:Ndip
+            cori=corr(Mrand_dipi(dipi1), Mrand_dipi(dipi2));
+%             R(dermi,dipi1)=max(cori, R(dermi,dipi1)); % .^Rpower
+            Rcorr(dipi1, dipi2, dermi)=cori; % .^Rpower
+        end
+    end
+       
     noise=randn(248,1);
     noise=noise./std(noise)*noiseFactor/3;
     interf=gain*randn(length(layer)*2,1);
@@ -98,9 +114,9 @@ for dermi=1:1000
 %     Mrecon=ori(1,:)*gain(:,[pntAvg(1),920+pntAvg(1)])';
 % then we can corrlate it with the real dipoles that contributed to Mrand
     
-    results(dermi,1:4)=getErrors(pnt,pnti,pntMed,layer);
-    results(dermi,5:8)=getErrors(pnt,pnti,pntAvg,layer);
-    results(dermi,9:12)=getErrors(pnt,pnti,pntR,layer);
+    [results(dermi,1:4), Dist{dermi,1}]=getErrors(pnt,pnti,pntMed,layer);
+    [results(dermi,5:8), Dist{dermi,2} ]=getErrors(pnt,pnti,pntAvg,layer);
+    [results(dermi,9:12),Dist{dermi,3} ]=getErrors(pnt,pnti,pntR,layer);
     %     resultsR(dermi,1)=length(pntinvR);
     %     resultsR(dermi,2)=sum(ismember(pntMaxi,input(dermi,:)));
     %     resultsR(dermi,3)=Rmax;
@@ -125,7 +141,7 @@ disp('done');
 % marikVirtual29plot(input,pnt,results);
 
 
-function errVec=getErrors(pnt,pnti,pntX,layer)
+function [errVec, distances]=getErrors(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
 errVec(1)=length(pntX);
