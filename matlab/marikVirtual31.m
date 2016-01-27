@@ -42,13 +42,12 @@ for dermi=1:1000
     %     Pow3=zeros(size(PowSim));
     %     Pow3(pnti)=1;
     %     figure;scatter3pnt(pnt,25,Pow3)
-    %% solve with RIMDA
     %tic
     Pow=zeros(length(gain),1);
     Mresid=Mrand;
     
     pntAll=[];
-    for dipi=1:Ndip
+    for dipi=1:5
         Rmax=0;
         rp=[];
         for loci=1:length(Pow)./2;
