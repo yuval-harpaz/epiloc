@@ -1,0 +1,157 @@
+function [pairCorr,pairCorrR, his, hisR]=Simulate_tp_fn_corr(noiseFactor)
+Rpower=100;
+for Ndip=2:5;
+    load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])
+    load (['Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(Rpower),'.mat'])
+    load pnt
+    load gain1
+    load layer
+    
+    % simulate best fit, more than 2 dipoles
+    %dist=[];
+    %distR=[];
+    count=0;
+    countR=0;
+    pairCorr{Ndip}=[];
+    pairCorrR{Ndip}=[];
+    for permi=1:1000
+        pairs=getErrors(Dist{permi,2});
+        %dist=[dist;Dist{permi,2}(pairs)];
+        rCorr=Rcorr(:,:,permi);
+        rCorr(logical(eye(Ndip)))=nan;
+        
+        for i=1:Ndip
+            j=Ndip;
+            while j>i
+                count=count+1;
+                pairCorr{Ndip}(count,1)=rCorr(i,j);
+                pairCorr{Ndip}(count,2)=(sum(pairs(:,i))+sum(pairs(:,j)))/2;
+                j=j-1;
+            end
+        end
+        
+        pairs=getErrors(Dist{permi,3});
+        %dist=[dist;Dist{permi,2}(pairs)];
+        rCorr=Rcorr(:,:,permi);
+        rCorr(logical(eye(Ndip)))=nan;
+        
+        for i=1:Ndip
+            j=Ndip;
+            while j>i
+                countR=countR+1;
+                pairCorrR{Ndip}(countR,1)=rCorr(i,j);
+                pairCorrR{Ndip}(countR,2)=(sum(pairs(:,i))+sum(pairs(:,j)))/2;
+                j=j-1;
+            end
+        end
+    end
+    %     avg=histc(pairCorr{Ndip}(:,1),[0:0.05:1]);
+    stepi=0.25;
+    bins=[-1:stepi:1];
+    his=NaN(length(bins),1);
+    %     for jj=1:length(pairCorr{Ndip}(:,1))
+    b=round(pairCorr{Ndip}(:,1)./stepi);
+    for bi=1:length(bins)
+        bii=b==(bins(bi)./stepi);
+        his(bi)=mean(pairCorr{Ndip}(bii,2));
+    end
+    
+    hisR=NaN(length(bins),1);
+    %     for jj=1:length(pairCorr{Ndip}(:,1))
+    b=round(pairCorrR{Ndip}(:,1)./stepi);
+    for bi=1:length(bins)
+        bii=b==(bins(bi)./stepi);
+        hisR(bi)=mean(pairCorrR{Ndip}(bii,2));
+    end
+  
+    figure;
+    plot(bins+stepi./2,his, 'r*-');
+    hold on;
+    plot(bins+stepi./2,hisR, 'bo-'); 
+    ylim([0 1]);
+    
+%     sum(avg)
+    %figure;hist(distR,100)
+    %     figure;
+    %     first=true;
+    %     for err=15:2.5:40
+    %         plot(err,sum(dist>=err)./length(dist),'og')
+    %         hold on
+    %         plot(err,sum(distR>=err)./length(distR),'^r')
+    %         if first
+    %             legend('RIMDA','Best Fit')
+    %             first=false;
+    %         end
+    %     end
+    %     xlim([13 42])
+    %     ylim([-0.05 0.15])
+    
+    %err=25;
+    % save(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor)],'results','input')
+    % marikVirtual29plot(input,pnt,results);
+    %     missAvgA=sum(uint8(results(:,5)-Ndip))./sum(results(:,5))*100;
+    %     missAvgB=sum(dist>=Err)./sum(results(:,5))*100;
+    %     missRA=sum(uint8(results(:,9)-Ndip))./sum(results(:,9))*100;
+    %     missRB=sum(distR>=Err)./sum(results(:,9))*100;
+    %     missR(Ndip)=missRB+missRA;
+    %     miss(Ndip)=missAvgB+missAvgA;
+    %     figure;
+    %     bar([missAvgB,missAvgA;missRB,missRA],'stacked')
+    %     set(gca, 'xticklabel', [{'RIMDA'},{'BEST FIT'}])
+    %     xlim([0.5 2.5])
+    %     legend('distant','superfluous')
+    %     title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
+end
+
+
+
+function pairs=getErrors(distances)
+
+distSum=0;
+depthErr=0;
+pairs=false(size(distances));
+for pairi=1:min(size(distances))
+    [minD,minDi]=sort(distances(:));
+    x=find(sum(distances==minD(1),1));
+    x=x(1); % when, say, there are two zero errors
+    y=find(distances(:,x)==minD(1));
+    y=y(1);
+    %y=find(sum(distances==minD(1),2));
+    %distSum=distSum+distances(y,x);
+    if size(distances,1)>size(distances,2) % more rows
+        distances(:,x)=max(minD(end));
+    else
+        distances(y,:)=max(minD(end));
+    end
+    pairs(y,x)=true;
+end
+
+
+
+% binSum=[];
+% binNacc=[];
+% binDacc=[];
+% binD=[];
+% conds={'MED','AVG','R'};
+% fff=0;
+% for condi=1:3
+%     for bini=3:15
+%         rowi=logical((results(:,3)>=(bini-10)).*(results(:,3)<(bini)));
+%         binSum(bini-2)=sum(rowi);
+%         binNacc(bini-2)=mean(results(rowi,1+fff)); % ratio of number of dipoles (1 of 2 etc)
+%         binDacc(bini-2)=mean(results(rowi,2+fff)); % ratio of right location
+%         binD(bini-2)=mean(results(rowi,3+fff));
+%     end
+%     figure;bar([35:10:155],binNacc)
+%     xlabel('Distance between dipoles (mm)')
+%     ylabel('detected dipoles')
+%     title(['How many dipoles were found',' ',conds{condi}])
+%     figure;bar([35:10:155],binDacc)
+%     xlabel('Distance between dipoles (mm)')
+%     ylabel('correctly detected dipoles')
+%     title(['How many dipoles were correctly localized',' ',conds{condi}])
+%     figure;bar([35:10:155],binD)
+%     xlabel('Distance between dipoles (mm)')
+%     title(['Mean distance error',' ',conds{condi}])
+%     ylabel('Distance error per dipole (mm)')
+% end
