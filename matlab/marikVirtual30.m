@@ -1,25 +1,21 @@
-function [results, Rcorr]=Simulate_tp_fn(Ndip, noiseFactor, Rpower)
+function results=marikVirtual30(amp)
 
 % simulate best fit, more than 2 dipoles
 
-% cd /home/yuval/Data/marik/som2/talk
+%cd /home/yuval/Data/marik/som2/talk
 load pnt
 load gain1
 load layer
 N=10000;
-% Ndip=1;
+Ndip=3;
 %% simulate
 inputLabel='simulated points index';
 resultsLabel={'N dipoles found','N correct location','distance'};
 results=[];
 input=[];
-% noiseFactor=0.3;
-
-der=1000;
-% R=zeros(der,Ndip);
-Rcorr=ones(Ndip,Ndip,der);
-Dist=cell(der, 3);  % 3 for 'MED', 'AVG', and 'R'
-for dermi=1:der
+noiseFactor=0.1;
+dipSize=[1/amp,1/amp,1];
+for dermi=1:1000
     %% make simulated field
     
     ran=rand(1,length(gain)/2);
@@ -28,6 +24,7 @@ for dermi=1:der
     input(dermi,1:Ndip)=Ran;
     pnti=Ran;
     Mrand=zeros(248,1);
+    Mstd=zeros(248,1);
     for dipi=1:Ndip
         %Ran=ran(1);
         srcPerm=false(1,length(gain)/2);
@@ -36,24 +33,15 @@ for dermi=1:der
         randOri=rand(1);
         randOri(2,1)=sqrt(1-randOri^2);
         randOri=randOri.*((rand(2,1)<0.5)-0.5)*2;
-        Mrand_dipi(dipi)=GainFwd*randOri;
-        Mrand=Mrand+Mrand_dipi(dipi); %GainFwd*randOri;
-%         Mrecon=ori(1,:)*gain(:,[pntAvg(1),920+pntAvg(1)])';
+        Mrand=Mrand+(dipSize(dipi).*GainFwd)*randOri;
+        Mstd=Mstd+GainFwd*randOri;
     end
-       
-    for dipi1=1:Ndip
-        for dipi2=1:Ndip
-            cori=corr(Mrand_dipi(dipi1), Mrand_dipi(dipi2));
-%             R(dermi,dipi1)=max(cori, R(dermi,dipi1)); % .^Rpower
-            Rcorr(dipi1, dipi2, dermi)=cori; % .^Rpower
-        end
-    end
-       
+    Mstd=std(Mstd);
     noise=randn(248,1);
     noise=noise./std(noise)*noiseFactor/3;
     interf=gain*randn(length(layer)*2,1);
     interf=interf./std(interf)*(2*noiseFactor/3);
-    Mrand=Mrand./std(Mrand);
+    Mrand=Mrand./Mstd;
 %     noise=noise./max(abs(noise)).*max(abs(Mrand'))*(noiseFactor/3); 
 %     interf=interf./max(abs(interf)).*max(abs(Mrand'))*(2*noiseFactor/3);
     Mrand=Mrand+noise+interf;
@@ -79,7 +67,7 @@ for dermi=1:der
             Gain=gain(:,[srcPerm,srcPerm]);
             source=Gain\Mrand;
             recon=Gain*source;
-            R=corr(recon,Mrand).^Rpower;
+            R=corr(recon,Mrand).^100;
             pow=zeros(size(Pow));
             pow([srcPerm,srcPerm])=source*R;
             Pow=Pow+pow;
@@ -108,15 +96,10 @@ for dermi=1:der
 %     results(dermi,1:6)=[length(pntMed),sum(ismember(pntMed,input(dermi,:))),...
 %         length(pntAvg),sum(ismember(pntAvg,input(dermi,:))),...
 %         length(pntR),sum(ismember(pntinvR,input(dermi,:)))];
-
-% for recounstructing the field of each located dipole at the solution:
-%     [current,ori,pntAvg,~]=getCurrent(PowAvg,pnt,Mrand,gain,30,0.3,false); % FIXME - check ori error?
-%     Mrecon=ori(1,:)*gain(:,[pntAvg(1),920+pntAvg(1)])';
-% then we can corrlate it with the real dipoles that contributed to Mrand
     
-    [results(dermi,1:4), Dist{dermi,1}]=getErrors(pnt,pnti,pntMed,layer);
-    [results(dermi,5:8), Dist{dermi,2} ]=getErrors(pnt,pnti,pntAvg,layer);
-    [results(dermi,9:12),Dist{dermi,3} ]=getErrors(pnt,pnti,pntR,layer);
+    results(dermi,1:4)=getErrors(pnt,pnti,pntMed,layer);
+    results(dermi,5:8)=getErrors(pnt,pnti,pntAvg,layer);
+    results(dermi,9:12)=getErrors(pnt,pnti,pntR,layer);
     %     resultsR(dermi,1)=length(pntinvR);
     %     resultsR(dermi,2)=sum(ismember(pntMaxi,input(dermi,:)));
     %     resultsR(dermi,3)=Rmax;
@@ -135,13 +118,10 @@ for dermi=1:der
     prog(dermi)
 end
 
-save(['results_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor)],'results','input')
+save(['results_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(amp)],'results','input')
 disp('done');
-
-% marikVirtual29plot(input,pnt,results);
-
-
-function [errVec, distances]=getErrors(pnt,pnti,pntX,layer)
+marikVirtual29plot(input,pnt,results);
+function errVec=getErrors(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
 errVec(1)=length(pntX);

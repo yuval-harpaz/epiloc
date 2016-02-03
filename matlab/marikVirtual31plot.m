@@ -1,4 +1,4 @@
-function [R,MED]=marikVirtual29plot(input,pnt,results)
+function [SEQ]=marikVirtual31plot(input,pnt,results)
 
 for linei=1:size(input,1)
     D(linei)=getDist(pnt,input(linei,:),input(linei,:));
@@ -12,11 +12,11 @@ binD=[];
 binDSTD=[];
 binDe=[];
 binDeSTD=[];
-conds={'MED','AVG','R'};
-R=zeros(18,1);
-MED=zeros(18,1);
+conds={'SEQ','AVG','R'};
+%R=zeros(18,1);
+SEQ=zeros(1,18);
 if size(input,2)>1
-    for condi=[1 3]
+    condi=1
         fff=4*condi-4;
         for bini=3:15
             rowi=logical((D>=(bini*10-10)).*(D<(bini*10)));
@@ -49,44 +49,43 @@ if size(input,2)>1
         % the 3 parameters: id_dip,dist_err, dist_depth_err)
         % distances 35mm 85mm 135mm
         
-        if condi==3
-            count_dist=1;
-            for dist=find(ismember([35:10:155],[35, 55, 75]))
-                R(count_dist)=binNacc(dist);
-                R(count_dist+2)=binD(dist);
-                R(count_dist+4)=binDe(dist);
-                R(count_dist+1)=binNaccSTD(dist);
-                R(count_dist+3)=binDSTD(dist);
-                R(count_dist+5)=binDeSTD(dist);
-                count_dist=count_dist+6;
-            end
-        elseif condi==1
-            count_dist=1;
-            for dist=find(ismember([35:10:155],[35, 55, 75]))
-                MED(count_dist)=binNacc(dist);
-                MED(count_dist+2)=binD(dist);
-                MED(count_dist+4)=binDe(dist);
-                MED(count_dist+1)=binNaccSTD(dist);
-                MED(count_dist+3)=binDSTD(dist);
-                MED(count_dist+5)=binDeSTD(dist);
-                count_dist=count_dist+6;
-            end
+        %         if condi==3
+        %             count_dist=1;
+        %             for dist=find(ismember([35:10:155],[35, 55, 75]))
+        %                 R(count_dist)=binNacc(dist);
+        %                 R(count_dist+2)=binD(dist);
+        %                 R(count_dist+4)=binDe(dist);
+        %                 R(count_dist+1)=binNaccSTD(dist);
+        %                 R(count_dist+3)=binDSTD(dist);
+        %                 R(count_dist+5)=binDeSTD(dist);
+        %                 count_dist=count_dist+6;
+        %             end
+        %         elseif condi==1
+        count_dist=1;
+        for dist=find(ismember([35:10:155],[35, 55, 75]))
+            SEQ(count_dist)=binNacc(dist);
+            SEQ(count_dist+2)=binD(dist);
+            SEQ(count_dist+4)=binDe(dist);
+            SEQ(count_dist+1)=binNaccSTD(dist);
+            SEQ(count_dist+3)=binDSTD(dist);
+            SEQ(count_dist+5)=binDeSTD(dist);
+            count_dist=count_dist+6;
         end
+        %         end
         
-    end
 else
-    R(1)=mean(results(:,9));
-    R(2)=std(results(:,9));
-    R(3)=mean(results(:,11));
-    R(4)=std(results(:,11));
-    R(5)=mean(results(:,12));
-    R(6)=std(results(:,12));
-    MED(1)=mean(results(:,1));
-    MED(2)=std(results(:,1));
-    MED(3)=mean(results(:,3));
-    MED(4)=std(results(:,3));
-    MED(5)=mean(results(:,4));
-    MED(6)=std(results(:,4));
+    %     R(1)=mean(results(:,9));
+    %     R(2)=std(results(:,9));
+    %     R(3)=mean(results(:,11));
+    %     R(4)=std(results(:,11));
+    %     R(5)=mean(results(:,12));
+    %     R(6)=std(results(:,12));
+    SEQ(1)=mean(results(:,1));
+    SEQ(2)=std(results(:,1));
+    SEQ(3)=mean(results(:,3));
+    SEQ(4)=std(results(:,3));
+    SEQ(5)=mean(results(:,4));
+    SEQ(6)=std(results(:,4));
 end
 
 
