@@ -48,6 +48,7 @@ for Ndip=1:5;
     legend('distant','superfluous')
     title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
     ylabel('the retio of false positive dipoles (%)')
+    ylim([0 25])
 end
 
 

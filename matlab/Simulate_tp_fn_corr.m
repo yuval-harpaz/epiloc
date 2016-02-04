@@ -46,28 +46,35 @@ for Ndip=2:5;
         end
     end
     %     avg=histc(pairCorr{Ndip}(:,1),[0:0.05:1]);
-    stepi=0.25;
+    stepi=2/7;
     bins=[-1:stepi:1];
-    his=NaN(length(bins),1);
-    %     for jj=1:length(pairCorr{Ndip}(:,1))
-    b=round(pairCorr{Ndip}(:,1)./stepi);
-    for bi=1:length(bins)
-        bii=b==(bins(bi)./stepi);
-        his(bi)=mean(pairCorr{Ndip}(bii,2));
+    his=NaN(length(bins)-1,1);
+    for bini=1:length(his)
+        linei=pairCorr{Ndip}(:,1)>=bins(bini) & pairCorr{Ndip}(:,1)<bins(bini+1);
+        his(bini)=mean(pairCorr{Ndip}(linei,2));
     end
-    
-    hisR=NaN(length(bins),1);
     %     for jj=1:length(pairCorr{Ndip}(:,1))
-    b=round(pairCorrR{Ndip}(:,1)./stepi);
-    for bi=1:length(bins)
-        bii=b==(bins(bi)./stepi);
-        hisR(bi)=mean(pairCorrR{Ndip}(bii,2));
+%     b=pairCorr{Ndip}(:,1)./stepi;
+%     btemp=b;
+%     btemp(b<0)=floor(b(b<0));
+%     btemp(b>0)=ceil(b(b>0));
+%         
+%     for bi=1:length(bins)
+%         bii=b==(bins(bi)./stepi);
+%         his(bi)=mean(pairCorr{Ndip}(bii,2));
+%     end
+    
+    hisR=NaN(length(bins)-1,1);
+    %     for jj=1:length(pairCorr{Ndip}(:,1))
+    for bini=1:length(his)
+        linei=pairCorrR{Ndip}(:,1)>=bins(bini) & pairCorrR{Ndip}(:,1)<bins(bini+1);
+        hisR(bini)=mean(pairCorrR{Ndip}(linei,2));
     end
   
     figure;
-    plot(bins+stepi./2,his, 'r*-');
+    plot(bins(1:end-1)+stepi/2,his, 'r*-');
     hold on;
-    plot(bins+stepi./2,hisR, 'bo-'); 
+    plot(bins(1:end-1)+stepi/2,hisR, 'bo-'); 
     ylim([0 1]);
     
 %     sum(avg)
