@@ -1,4 +1,4 @@
-function [current,ori,pnti,Pow3]=getCurrent(pow,pnt,M,gain, maxdist, threshold, figs)
+function [current,ori,pnti,Pow3,fwd]=getCurrent(pow,pnt,M,gain, maxdist, threshold, figs)
 
 % pow is Pow1, 2 dipoles per location
 % recomended:
@@ -54,10 +54,10 @@ current=Gain\M;
 R=(corr(Gain*current,M)).^2;
 src=zeros(size(Pow2));
 src(pnti)=current;
+fwd=Gain*current;
 if figs
     figure;
     scatter3pnt(pnt,25,src)
-    fwd=Gain*current;
     figure;
     topoplot248(fwd);
     title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
