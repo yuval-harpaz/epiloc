@@ -1,13 +1,24 @@
-
-cd ('/home/yuval/Data/marik/som2/talk');
+try 
+    cd ('/home/yuval/Data/marik/som2/talk');
+catch err
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim');
+end
 load pnt
+
+try 
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim/SEQ/');
+catch err
+    cd('./');
+end
 for noiseFactor=[0.1 0.3]
     for Ndip=1:5
         [results, Rcorr, Dist]=marikVirtual31(Ndip, noiseFactor);
         eval(['save SEQ_Rcorr_Dist_',num2str(Ndip),'_', num2str(noiseFactor),'.mat Dist Rcorr']);
     end
     clear all
+%     cd ..
     load pnt
+    cd('./SEQ')
 end
 
 

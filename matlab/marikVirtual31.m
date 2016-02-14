@@ -2,10 +2,18 @@ function [results, Rcorr, Dist]=marikVirtual31(Ndip, noiseFactor)
 
 % simulate sequential dipole fitting
 
-%cd /home/yuval/Data/marik/som2/talk
+c_path=pwd;
+try 
+    cd /home/yuval/Data/marik/som2/talk
+catch err
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim');
+end
 load pnt
 load gain1
 load layer
+
+eval(['cd ',c_path]);
+
 N=10000;
 Rcorr=ones(Ndip,Ndip,1000);
 Dist=cell(1000, 1);  %
