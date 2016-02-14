@@ -51,15 +51,16 @@ end
 % figure;
 % scatter3pnt(pnt,25,Pow2)
 current=Gain\M;
-R=(corr(Gain*current,M)).^2;
-src=zeros(size(Pow2));
-src(pnti)=current;
 fwd=Gain*current;
+R=(corr(fwd(:),M(:))).^2;
+src=zeros(size(Pow2));
+src(pnti)=mean(current,2);
+
 if figs
     figure;
     scatter3pnt(pnt,25,src)
     figure;
-    topoplot248(fwd);
+    topoplot248(mean(fwd,2));
     title([num2str(size(pnti,1)),' dipoles explain ',num2str(round(R*100)),'%'])
 end
 Pow3=zeros(size(Pow2));
@@ -68,7 +69,7 @@ for maxi=1:length(pnti)
     pos=pnt(pnti(maxi),:);
     distnc=sqrt(sum((pnt(clusti,:)-repmat(pos,length(clusti),1)).^2,2));
     neighb=clusti(distnc<maxdist);
-    Pow3(neighb)=current(maxi);
+    Pow3(neighb)=mean(current(maxi,:));
 end
 if figs
     figure;

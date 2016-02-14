@@ -1,4 +1,4 @@
-function rimda(M)
+function PowCur=rimda(M)
 
 N=10000;
 
@@ -52,7 +52,7 @@ else
 end
 %% 
 Npnt=length(pnt);
-Pow=zeros(2*Npnt,1);
+Pow=zeros(2*Npnt,size(M,2));
 for permi=1:N
     Ran=[];
     [~,ran]=sort(rand(1,Npnt));
@@ -63,9 +63,10 @@ for permi=1:N
     Gain=gain(:,[srcPerm,srcPerm]);
     source=Gain\M;
     recon=Gain*source;
-    R=corr(recon,M).^100;
-    pow=zeros(size(Pow));
-    pow([srcPerm,srcPerm])=source*R;
+    R=corr(recon(:),M(:)).^100;
+    pow=zeros(size(Pow,1),size(M,2));
+    % FIXME - do not aVERAGE SOURCE across time, make larger pow.
+    pow([srcPerm,srcPerm],:)=source.*R;
     Pow=Pow+pow;
     prog(permi)
 end
@@ -75,23 +76,23 @@ end
 %figure;scatter3pnt(pnt,25,PowSim)
 [current,~,pnti,~,fwd]=getCurrent(Pow,pnt,M,gain,30,0.3,false);
 PowCur=zeros(Npnt,1);
-PowCur(pnti)=current;
+PowCur(pnti)=mean(current,2);
 cfg=[];
 cfg.interactive='no';
 cfg.comment='Measured';
 figure;
 subplot(2,2,1)
-topoplot248(M,cfg);
+topoplot248(mean(M,2),cfg);
 subplot(2,2,2)
 cfg.comment='Reconstructed';
-topoplot248(fwd,cfg);
+topoplot248(mean(fwd,2),cfg);
 subplot(2,2,3)
 cfg.comment='Residual';
-topoplot248(M-fwd,cfg);
+topoplot248(mean(M,2)-mean(fwd,2),cfg);
 subplot(2,2,4)
 plot3pnt(hs,'.k');
 hold on
-scatter3pnt(pnt(pnti,:),25,current)
+scatter3pnt(pnt(pnti,:),25,mean(current,2))
 scatter3pnt(pnt,1,PowCur)
 colorbar off
 rotate3d on
