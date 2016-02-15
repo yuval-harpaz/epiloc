@@ -18,7 +18,7 @@ for noiseFactor=[0.1 0.3]
     clear all
 %     cd ..
     load pnt
-    cd('./SEQ')
+%     cd('./SEQ')
 end
 
 

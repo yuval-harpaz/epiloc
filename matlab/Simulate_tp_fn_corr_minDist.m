@@ -1,12 +1,12 @@
-function [pairCorr,pairCorrR, pairCorrS, his, hisR, hisS]=Simulate_tp_fn_corr(noiseFactor)
+function [pairCorr,pairCorrR, pairCorrS, his, hisR, hisS]=Simulate_tp_fn_corr_minDist(noiseFactor)
 Rpower=100;
+minDist=25;
 for Ndip=2:5;
     
     load pnt
     load gain1
     load layer
 
-    
     load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])
     load (['Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(Rpower),'.mat'])
     % simulate best fit, more than 2 dipoles
@@ -18,21 +18,39 @@ for Ndip=2:5;
     pairCorrR{Ndip}=[];
     for permi=1:1000
         pairs=getErrors(Dist{permi,2});
+        
+        vec=Dist{permi,2}(pairs);
+        vecDist=zeros(1,Ndip);
+        pairs_ind=find(sum(pairs));
+        vecDist(pairs_ind)=vec;
+        vecDist=vecDist<=minDist; 
+        vecDist=~vecDist;
+        
         %dist=[dist;Dist{permi,2}(pairs)];
         rCorr=Rcorr(:,:,permi);
         rCorr(logical(eye(Ndip)))=nan;
         
         for i=1:Ndip
+            
             j=Ndip;
             while j>i
-                count=count+1;
+                count=count+1;                
                 pairCorr{Ndip}(count,1)=rCorr(i,j);
-                pairCorr{Ndip}(count,2)=(sum(pairs(:,i))+sum(pairs(:,j)))/2;
+                pairCorr{Ndip}(count,2)=((sum(pairs(:,i))-vecDist(i))+(sum(pairs(:,j))-vecDist(j)))/2;               
                 j=j-1;
             end
+            
         end
         
         pairs=getErrors(Dist{permi,3});
+        
+        vec=Dist{permi,3}(pairs);
+        vecDist=zeros(1,Ndip);
+        pairs_ind=find(sum(pairs));
+        vecDist(pairs_ind)=vec;
+        vecDist=vecDist<=minDist; 
+        vecDist=~vecDist;
+        
         %dist=[dist;Dist{permi,2}(pairs)];
         rCorr=Rcorr(:,:,permi);
         rCorr(logical(eye(Ndip)))=nan;
@@ -42,7 +60,7 @@ for Ndip=2:5;
             while j>i
                 countR=countR+1;
                 pairCorrR{Ndip}(countR,1)=rCorr(i,j);
-                pairCorrR{Ndip}(countR,2)=(sum(pairs(:,i))+sum(pairs(:,j)))/2;
+                pairCorrR{Ndip}(countR,2)=((sum(pairs(:,i))-vecDist(i))+(sum(pairs(:,j))-vecDist(j)))/2;               
                 j=j-1;
             end
         end
@@ -81,6 +99,14 @@ for Ndip=2:5;
     for permi=1:1000
         
         pairs=getErrors(Dist{permi,1});
+        
+        vec=Dist{permi,1}(pairs);
+        vecDist=zeros(1,Ndip);
+        pairs_ind=find(sum(pairs));
+        vecDist(pairs_ind)=vec;
+        vecDist=vecDist<=minDist; 
+        vecDist=~vecDist;
+        
         %dist=[dist;Dist{permi,2}(pairs)];
         rCorr=Rcorr(:,:,permi);
         rCorr(logical(eye(Ndip)))=nan;
@@ -90,10 +116,11 @@ for Ndip=2:5;
             while j>i
                 countS=countS+1;
                 pairCorrS{Ndip}(countS,1)=rCorr(i,j);
-                pairCorrS{Ndip}(countS,2)=(sum(pairs(:,i))+sum(pairs(:,j)))/2;
+                pairCorrS{Ndip}(countS,2)=((sum(pairs(:,i))-vecDist(i))+(sum(pairs(:,j))-vecDist(j)))/2;               
                 j=j-1;
             end
         end
+        
     end
     %     avg=histc(pairCorr{Ndip}(:,1),[0:0.05:1]);
     hisS=NaN(length(bins)-1,1);
@@ -141,30 +168,6 @@ for Ndip=2:5;
     %     legend('distant','superfluous')
     %     title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
 end
-
-
-
-% % function pairs=getErrors(distances)
-% % 
-% % distSum=0;
-% % depthErr=0;
-% % pairs=false(size(distances));
-% % for pairi=1:min(size(distances))
-% %     [minD,minDi]=sort(distances(:));
-% %     x=find(sum(distances==minD(1),1));
-% %     x=x(1); % when, say, there are two zero errors
-% %     y=find(distances(:,x)==minD(1));
-% %     y=y(1);
-% %     %y=find(sum(distances==minD(1),2));
-% %     %distSum=distSum+distances(y,x);
-% %     if size(distances,1)>size(distances,2) % more rows
-% %         distances(:,x)=max(minD(end));
-% %     else
-% %         distances(y,:)=max(minD(end));
-% %     end
-% %     pairs(y,x)=true;
-% % end
-
 
 
 % binSum=[];
