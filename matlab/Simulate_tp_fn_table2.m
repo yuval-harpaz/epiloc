@@ -1,6 +1,8 @@
-function [miss,missR]=Simulate_tp_fn_table2(noiseFactor,Err)
+function [miss,missR, mat_miss]=Simulate_tp_fn_table2(noiseFactor,Err, isFig)
     Rpower=100;
-for Ndip=1:5;
+    Ndip_options=1:5;
+    mat_miss=cell(length(Ndip_options),1);
+for Ndip=Ndip_options;
     load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])
     load (['Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(Rpower),'.mat'])
        
@@ -39,16 +41,19 @@ for Ndip=1:5;
     missSEQB=sum(dist>=Err)./sum(results(:,1))*100;
     missSEQ(Ndip)=missSEQB+missSEQA;
 
-    figure;
-    bar([missAvgB,missAvgA;missRB,missRA; missSEQB,missSEQA],'stacked')
-    set(gca, 'xticklabel', [{'RIMDA'},{'BEST FIT'}, {'SEQ'}])
-    xlim([0.5 3.5])
-    legend('distant','superfluous')
-    title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
-    ylabel('the retio of false positive dipoles (%)')
-    ylim([0 25])
-
+    mat_miss{Ndip}=[missAvgB,missAvgA;missRB,missRA; missSEQB,missSEQA];
     
+    if isFig==1
+        figure;
+        bar(mat_miss{Ndip},'stacked')
+        set(gca, 'xticklabel', [{'RIMDA'},{'BEST FIT'}, {'SEQ'}])
+        xlim([0.5 3.5])
+        legend('distant','superfluous')
+        title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
+        ylabel('the ratio of false positive dipoles (%)')
+        ylim([0 25])
+    end
+        
 end
 
 
