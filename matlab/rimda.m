@@ -65,7 +65,6 @@ for permi=1:N
     recon=Gain*source;
     R=corr(recon(:),M(:)).^100;
     pow=zeros(size(Pow,1),size(M,2));
-    % FIXME - do not aVERAGE SOURCE across time, make larger pow.
     pow([srcPerm,srcPerm],:)=source.*R;
     Pow=Pow+pow;
     prog(permi)
@@ -74,25 +73,45 @@ end
 
 %PowSim=sqrt(Pow(1:Npnt).^2+Pow(Npnt+1:2*Npnt).^2);
 %figure;scatter3pnt(pnt,25,PowSim)
-[current,~,pnti,~,fwd]=getCurrent(Pow,pnt,M,gain,30,0.3,false);
-PowCur=zeros(Npnt,1);
-PowCur(pnti)=mean(current,2);
-cfg=[];
-cfg.interactive='no';
-cfg.comment='Measured';
-figure;
-subplot(2,2,1)
-topoplot248(mean(M,2),cfg);
-subplot(2,2,2)
-cfg.comment='Reconstructed';
-topoplot248(mean(fwd,2),cfg);
-subplot(2,2,3)
-cfg.comment='Residual';
-topoplot248(mean(M,2)-mean(fwd,2),cfg);
-subplot(2,2,4)
-plot3pnt(hs,'.k');
-hold on
-scatter3pnt(pnt(pnti,:),25,mean(current,2))
-scatter3pnt(pnt,1,PowCur)
-colorbar off
-rotate3d on
+[current,~,pnti,fwd]=getCurrent2(Pow,pnt,M,gain,30,0.3,false);
+%[current,~,pnti,~,fwd]=getCurrent(Pow,pnt,M,gain,30,0.3,false);
+if size(M,2)==1
+    PowCur=zeros(Npnt,1);
+    PowCur(pnti)=mean(current,2);
+    cfg=[];
+    cfg.interactive='no';
+    cfg.comment='Measured';
+    figure;
+    subplot(2,2,1)
+    topoplot248(mean(M,2),cfg);
+    subplot(2,2,2)
+    cfg.comment='Reconstructed';
+    topoplot248(mean(fwd,2),cfg);
+    subplot(2,2,3)
+    cfg.comment='Residual';
+    topoplot248(mean(M,2)-mean(fwd,2),cfg);
+    subplot(2,2,4)
+    plot3pnt(hs,'.k');
+    hold on
+    scatter3pnt(pnt(pnti,:),25,mean(current,2))
+    scatter3pnt(pnt,1,PowCur)
+    colorbar off
+    rotate3d on
+else
+%     FIXME - make more plots
+%     perhaps make in getCurrent2 a source estimation based on single time points, concatenated
+    [~,sizei]=sort(max(current,[],2),'descend');
+    figure;
+    plot(current','color',[0.9 0.9 0.9])
+    hold on
+    for linei=1:5
+        plot(current(sizei(linei),:),'color',(linei-1).*[0.15 0.15 0.15],'linewidth',6-linei)
+    end
+    figure;
+    hold on
+    for linei=1:5
+        scatter3pnt(pnt(pnti(sizei(linei)),:),(6-linei)*5,(linei-1).*[0.15 0.15 0.15]);
+    end
+    scatter3pnt(pnt(pnti(sizei(6:end)),:),5,[0.9 0.9 0.9]);
+    scatter3pnt(pnt,3,[0.9 0.9 0.9]);
+end
