@@ -93,9 +93,9 @@ for dermi=1:1000
 %         length(pntAvg),sum(ismember(pntAvg,input(dermi,:))),...
 %         length(pntR),sum(ismember(pntinvR,input(dermi,:)))];
     
-    results(dermi,1:4)=getErrors(pnt,pnti,pntMed,layer);
-    results(dermi,5:8)=getErrors(pnt,pnti,pntAvg,layer);
-    results(dermi,9:12)=getErrors(pnt,pnti,pntR,layer);
+    results(dermi,1:4)=getErrors2(pnt,pnti,pntMed,layer);
+    results(dermi,5:8)=getErrors2(pnt,pnti,pntAvg,layer);
+    results(dermi,9:12)=getErrors2(pnt,pnti,pntR,layer);
     %     resultsR(dermi,1)=length(pntinvR);
     %     resultsR(dermi,2)=sum(ismember(pntMaxi,input(dermi,:)));
     %     resultsR(dermi,3)=Rmax;
@@ -117,7 +117,7 @@ end
 save(['results_',num2str(Ndip),'_',num2str(noiseFactor)],'results','input')
 disp('done');
 marikVirtual29plot(input,pnt,results);
-function errVec=getErrors(pnt,pnti,pntX,layer)
+function errVec=getErrors2(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
 errVec(1)=length(pntX);
@@ -137,11 +137,11 @@ for pairi=1:min([length(pnti),length(pntX)])
     y=y(1);
     %y=find(sum(distances==minD(1),2));
     distSum=distSum+distances(y,x);
-    if length(pnti)>length(pntX) % more rows
-        distances(:,x)=max(minD(end));
-    else
-        distances(y,:)=max(minD(end));
-    end
+% %     if length(pnti)>length(pntX) % more rows
+        distances(:,x)=max(minD(end))+1;
+% %     else
+        distances(y,:)=max(minD(end))+1;
+% %     end
     depthErr=depthErr+layer(pnti(x))-layer(pntX(y));
 end
 depthErr=depthErr./pairi;

@@ -2,10 +2,18 @@ function [results, Rcorr, Dist]=marikVirtual31(Ndip, noiseFactor)
 
 % simulate sequential dipole fitting
 
-%cd /home/yuval/Data/marik/som2/talk
+c_path=pwd;
+try 
+    cd /home/yuval/Data/marik/som2/talk
+catch err
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim');
+end
 load pnt
 load gain1
 load layer
+
+eval(['cd ',c_path]);
+
 N=10000;
 Rcorr=ones(Ndip,Ndip,1000);
 Dist=cell(1000, 1);  %
@@ -84,7 +92,7 @@ for dermi=1:1000
     end
     [~,~,pntSeq,~]=getCurrent(Pow,pnt,Mrand,gain,30,0.3,false); % FIXME - check ori error?
     
-    [results(dermi,1:4), Dist{dermi,1}]=getErrors(pnt,pnti,pntSeq,layer);
+    [results(dermi,1:4), Dist{dermi,1}]=getErrors2(pnt,pnti,pntSeq,layer);
     %results(dermi,1:4)=getErrors(pnt,pnti,pntSeq,layer);
     prog(dermi)
 end
@@ -92,7 +100,7 @@ end
 save(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'],'results','input')
 disp('done');
         
-function [errVec, distances]=getErrors(pnt,pnti,pntX,layer)
+function [errVec, distances]=getErrors2(pnt,pnti,pntX,layer)
 errVec=[];
 distances=[];
 errVec(1)=length(pntX);
@@ -113,11 +121,11 @@ for pairi=1:min([length(pnti),length(pntX)])
     y=y(1);
     %y=find(sum(distances==minD(1),2));
     distSum=distSum+distances(y,x);
-    if length(pnti)>length(pntX) % more rows
-        distances(:,x)=max(minD(end));
-    else
-        distances(y,:)=max(minD(end));
-    end
+% %     if length(pnti)>length(pntX) % more rows
+        distances(:,x)=max(minD(end))+1;
+% %     else
+        distances(y,:)=max(minD(end))+1;
+% %     end
     depthErr=depthErr+layer(pnti(x))-layer(pntX(y));
 end
 depthErr=depthErr./pairi;

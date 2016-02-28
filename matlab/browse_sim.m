@@ -1,7 +1,17 @@
-cd ('/home/yuval/Data/marik/som2/talk');
+try 
+    cd ('/home/yuval/Data/marik/som2/talk');
+catch err
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim');
+end
 load('layer.mat')
 load('gain1.mat')
 load('pnt.mat')
+
+try
+    cd('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/sim/R_100');
+catch err
+    cd .
+end
 
 for noiseFactor=[0.1 0.3]
     for Ndip=1:5
