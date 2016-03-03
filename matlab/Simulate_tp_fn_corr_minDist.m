@@ -135,7 +135,9 @@ for Ndip=2:5;
     plot(bins(1:end-1)+stepi/2,hisR, 'bo-');     
     plot(bins(1:end-1)+stepi/2,hisS, 'gd-');
     ylim([0 1]);
-    
+    ylabel('fraction of dipoles identified from each pair');
+    xlabel('correlation between the fields of each pair of dipoles');
+    title(['Histogram noise factor ' num2str(noiseFactor)]);
 %     sum(avg)
     %figure;hist(distR,100)
     %     figure;

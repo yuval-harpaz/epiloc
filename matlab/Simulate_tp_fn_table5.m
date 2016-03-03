@@ -1,7 +1,14 @@
-function [miss,missR, mat_miss]=Simulate_tp_fn_table2(noiseFactor,Err, isFig)
-    Rpower=100;
-    Ndip_options=1:5;
-    mat_miss=cell(length(Ndip_options),1);
+function [miss,missR,missSEQ,mat_miss,mAA,mAB,mRA,mRB,mSA,mSB]=Simulate_tp_fn_table5(noiseFactor,Err, isFig)
+
+% Instead of summing number of surplous dipoles we find number of
+% occurencess (iterations) that there were surplos dipoles
+
+Rpower=100;
+Ndip_options=1:5;
+mat_miss=cell(length(Ndip_options),1);
+mAA=zeros(length(Ndip_options),2); mAB=zeros(length(Ndip_options),2);
+mRA=zeros(length(Ndip_options),2); mRB=zeros(length(Ndip_options),2);
+mSA=zeros(length(Ndip_options),2); mSB=zeros(length(Ndip_options),2);    
 for Ndip=Ndip_options;
     load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])
     load (['Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'_',num2str(Rpower),'.mat'])
@@ -20,25 +27,35 @@ for Ndip=Ndip_options;
         distR=[distR;Dist{permi,3}(pairs)];
     end
 
-    missAvgA=sum(uint8(results(:,5)-Ndip))./sum(results(:,5))*100;
-    missAvgB=sum(dist>=Err)./size(dist,1)*100;
-    missRA=sum(uint8(results(:,9)-Ndip))./sum(results(:,9))*100;
-    missRB=sum(distR>=Err)./size(distR,1)*100;
+    %%   
+    mAA(Ndip,1:2)=[length(find(uint8(results(:,5)-Ndip))), sum(results(:,5))];
+    mAB(Ndip,1:2)=[length(find(dist>=Err)), size(dist,1)];
+    missAvgA=mAA(Ndip,1)./mAA(Ndip,2)*100;
+    missAvgB=mAB(Ndip,1)./mAB(Ndip,2)*100; 
+    
+    mRA(Ndip,1:2)=[length(find(uint8(results(:,9)-Ndip))), sum(results(:,9))];
+    mRB(Ndip,1:2)=[length(find(distR>=Err)), size(distR,1)];
+    missRA=mRA(Ndip,1)./mRA(Ndip,2)*100;
+    missRB=mRB(Ndip,1)./mRB(Ndip,2)*100;
+        
     missR(Ndip)=missRB+missRA;
     miss(Ndip)=missAvgB+missAvgA;
     
     load(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     load (['SEQ_Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     
-        % simulate best fit, more than 2 dipoles
+    % simulate best fit, more than 2 dipoles
     distS=[];
     for permi=1:1000
         pairs=getErrors(Dist{permi,1});
         distS=[distS;Dist{permi,1}(pairs)];
     end
 
-    missSEQA=sum(uint8(results(:,1)-Ndip))./sum(results(:,1))*100;
-    missSEQB=sum(distS>=Err)./size(distS,1)*100;
+    mSA(Ndip,1:2)=[length(find(uint8(results(:,1)-Ndip))), sum(results(:,1))];
+    mSB(Ndip,1:2)=[length(find(distS>=Err)), size(distS,1)];
+    missSEQA=mSA(Ndip,1)./mSA(Ndip,2)*100;
+    missSEQB=mSB(Ndip,1)./mSB(Ndip,2)*100;
+    
     missSEQ(Ndip)=missSEQB+missSEQA;
 
     mat_miss{Ndip}=[missAvgB,missAvgA;missRB,missRA; missSEQB,missSEQA];
@@ -51,7 +68,7 @@ for Ndip=Ndip_options;
         legend('distant','superfluous')
         title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
         ylabel('the ratio of false positive dipoles (%)')
-        ylim([0 35])
+        ylim([0 25])
     end
         
 end

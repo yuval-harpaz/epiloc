@@ -1,4 +1,4 @@
-function [miss,missR, mat_miss]=Simulate_tp_fn_table2(noiseFactor,Err, isFig)
+function [miss,missR,missSEQ,mat_miss,sensi,sensiR,sensiSEQ,PVplus,PVplusR,PVplusSEQ]=Simulate_tp_fn_table3(noiseFactor,Err, isFig)
     Rpower=100;
     Ndip_options=1:5;
     mat_miss=cell(length(Ndip_options),1);
@@ -27,6 +27,25 @@ for Ndip=Ndip_options;
     missR(Ndip)=missRB+missRA;
     miss(Ndip)=missAvgB+missAvgA;
     
+    % number of dipoles identified = results(1,:) or results(5,:);
+    % results(9,:); SEQ -> results(1,:) 
+    % false alarms (FP) = miss(Ndip)
+    % hits = results(5,:) - miss(Ndip)
+    
+%     hits(Ndip)=(sum(uint8(results(:,5)))- (miss(Ndip)*(sum(results(:,5))*100)))./sum(results(:,5))*100;
+%     hitsR(Ndip)=(sum(uint8(results(:,9)))- (missR(Ndip)*(sum(results(:,9))*100)))./sum(results(:,9))*100;
+    hits(Ndip)= 100-miss(Ndip);
+    hitsR(Ndip)= 100-missR(Ndip);
+    
+    % sensitivity = hits/(number of dipoles placed)
+    % PV+ = hits/(number of dipoles identified)
+    
+    sensi(Ndip)=(hits(Ndip)*sum(results(:,5)))/(Ndip*length(results)*100);
+    sensiR(Ndip)=(hitsR(Ndip)*sum(results(:,9)))/(Ndip*length(results)*100);
+    PVplus(Ndip)=hits(Ndip)./100;
+    PVplusR(Ndip)=hitsR(Ndip)./100;
+ 
+
     load(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     load (['SEQ_Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     
@@ -40,6 +59,11 @@ for Ndip=Ndip_options;
     missSEQA=sum(uint8(results(:,1)-Ndip))./sum(results(:,1))*100;
     missSEQB=sum(distS>=Err)./size(distS,1)*100;
     missSEQ(Ndip)=missSEQB+missSEQA;
+    
+    %     hitsSEQ(Ndip)=(sum(uint8(results(:,1)))- (missSEQ(Ndip)*(sum(results(:,1))*100)))./sum(results(:,1))*100;
+    hitsSEQ(Ndip)= 100 -missSEQ(Ndip);
+    sensiSEQ(Ndip)=(hitsSEQ(Ndip)*sum(results(:,1)))/(Ndip*length(results)*100);
+    PVplusSEQ(Ndip)=hitsSEQ(Ndip)./100;    
 
     mat_miss{Ndip}=[missAvgB,missAvgA;missRB,missRA; missSEQB,missSEQA];
     
@@ -51,7 +75,7 @@ for Ndip=Ndip_options;
         legend('distant','superfluous')
         title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
         ylabel('the ratio of false positive dipoles (%)')
-        ylim([0 35])
+        ylim([0 25])
     end
         
 end

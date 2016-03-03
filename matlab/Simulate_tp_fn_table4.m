@@ -1,4 +1,4 @@
-function [miss,missR, mat_miss]=Simulate_tp_fn_table2(noiseFactor,Err, isFig)
+function [miss,missR,missSEQ,mat_miss,speci,speciR,speciSEQ,PVminus,PVminusR,PVminusSEQ]=Simulate_tp_fn_table4(noiseFactor,Err, isFig)
     Rpower=100;
     Ndip_options=1:5;
     mat_miss=cell(length(Ndip_options),1);
@@ -13,13 +13,14 @@ for Ndip=Ndip_options;
     % simulate best fit, more than 2 dipoles
     dist=[];
     distR=[];
-    for permi=1:1000
+    for permi=1:length(results)%1000
         pairs=getErrors(Dist{permi,2});
         dist=[dist;Dist{permi,2}(pairs)];
         pairs=getErrors(Dist{permi,3});
         distR=[distR;Dist{permi,3}(pairs)];
     end
 
+    %% miss* should have been called false alarms
     missAvgA=sum(uint8(results(:,5)-Ndip))./sum(results(:,5))*100;
     missAvgB=sum(dist>=Err)./size(dist,1)*100;
     missRA=sum(uint8(results(:,9)-Ndip))./sum(results(:,9))*100;
@@ -27,10 +28,57 @@ for Ndip=Ndip_options;
     missR(Ndip)=missRB+missRA;
     miss(Ndip)=missAvgB+missAvgA;
     
+    % number of dipoles identified = results(1,:) or results(5,:);
+    % results(9,:); SEQ -> results(1,:) 
+    % false alarms (FP) = miss(Ndip)
+    % hits = results(5,:) - miss(Ndip)
+    
+%     hits(Ndip)=(sum(uint8(results(:,5)))- (miss(Ndip)*(sum(results(:,5))*100)))./sum(results(:,5))*100;
+%     hitsR(Ndip)=(sum(uint8(results(:,9)))- (missR(Ndip)*(sum(results(:,9))*100)))./sum(results(:,9))*100;
+    hits(Ndip)= 100- miss(Ndip);
+    hitsR(Ndip)= 100 -missR(Ndip);
+    
+    % sensitivity = hits/(number of dipoles placed)
+    % PV+ = hits/(number of dipoles identified)
+    
+    sensi(Ndip)=(hits(Ndip)*sum(results(:,5)))/(Ndip*length(results)*100);
+    sensiR(Ndip)=(hitsR(Ndip)*sum(results(:,9)))/(Ndip*length(results)*100);
+    PVplus(Ndip)=hits(Ndip)./100;
+    PVplusR(Ndip)=hitsR(Ndip)./100;
+    
+    % misses = (number of dipoles placed) - hits
+    Ms(Ndip)=(Ndip*length(results))-(hits(Ndip)*sum(uint8(results(:,5)))/100);
+    MsR(Ndip)=(Ndip*length(results))-(hitsR(Ndip)*sum(uint8(results(:,9)))/100);
+        
+    % specificity = 
+    % (number of iterations all dipoles were correctly identified)/[(number of iterations all dipoles were correctly identified) + false alarms]
+    % PV- = 
+    % (number of iterations all dipoles were correctly identified)/[(number of iterations all dipoles were correctly identified) + misses]
+    
+%     iter_correct=sum((uint8(results(:,5))==Ndip));    
+%     iter_correctR=sum((uint8(results(:,9))==Ndip));    
+    iter_correct=zeros(length(results),1);
+    iter_correctR=zeros(length(results),1);
+    for permi2=1:length(results)
+        if uint8(results(permi2,5))<=Ndip && dist(permi2)<Err
+           iter_correct(permi2)=1; 
+        end
+        if uint8(results(permi2,9))<=Ndip && distR(permi2)<Err
+           iter_correctR(permi2)=1; 
+        end
+    end
+    iter_correct=sum(iter_correct);    
+    iter_correctR=sum(iter_correctR);
+    
+    speci(Ndip)=iter_correct/(iter_correct+(miss(Ndip)*sum(uint8(results(:,5)))/100));
+    speciR(Ndip)=iter_correctR/(iter_correctR+(missR(Ndip)*sum(uint8(results(:,9)))/100));
+    PVminus(Ndip)=iter_correct/(iter_correct+Ms(Ndip));
+    PVminusR(Ndip)=iter_correctR/(iter_correctR+MsR(Ndip));
+    
     load(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     load (['SEQ_Rcorr_Dist_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
     
-        % simulate best fit, more than 2 dipoles
+    % simulate best fit, more than 2 dipoles
     distS=[];
     for permi=1:1000
         pairs=getErrors(Dist{permi,1});
@@ -40,6 +88,25 @@ for Ndip=Ndip_options;
     missSEQA=sum(uint8(results(:,1)-Ndip))./sum(results(:,1))*100;
     missSEQB=sum(distS>=Err)./size(distS,1)*100;
     missSEQ(Ndip)=missSEQB+missSEQA;
+    
+    %     hitsSEQ(Ndip)=(sum(uint8(results(:,1)))- (missSEQ(Ndip)*(sum(results(:,1))*100)))./sum(results(:,1))*100;
+    hitsSEQ(Ndip)= 100 -missSEQ(Ndip);
+    sensiSEQ(Ndip)=(hitsSEQ(Ndip)*sum(results(:,1)))/(Ndip*length(results)*100);
+    PVplusSEQ(Ndip)=hitsSEQ(Ndip)./100;  
+    
+    MsSEQ(Ndip)=(Ndip*length(results))-(hitsSEQ(Ndip)*sum(uint8(results(:,1)))/100);
+
+%     iter_correctSEQ=sum((uint8(results(:,1))==Ndip));    
+    iter_correctSEQ=zeros(length(results),1);
+    for permi2=1:length(results)
+        if uint8(results(permi2,1))<=Ndip && distS(permi2)<Err
+           iter_correctSEQ(permi2)=1; 
+        end
+    end
+    iter_correctSEQ=sum(iter_correctSEQ);    
+    
+    speciSEQ(Ndip)=iter_correctSEQ/(iter_correctSEQ+(missSEQ(Ndip)*sum(uint8(results(:,1)))/100));
+    PVminusSEQ(Ndip)=iter_correctSEQ/(iter_correctSEQ+MsSEQ(Ndip));
 
     mat_miss{Ndip}=[missAvgB,missAvgA;missRB,missRA; missSEQB,missSEQA];
     
@@ -51,7 +118,7 @@ for Ndip=Ndip_options;
         legend('distant','superfluous')
         title([num2str(Ndip),' dipoles, false positive for ',num2str(Err),'mm or more'])
         ylabel('the ratio of false positive dipoles (%)')
-        ylim([0 35])
+        ylim([0 25])
     end
         
 end
