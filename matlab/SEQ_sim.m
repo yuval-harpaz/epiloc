@@ -268,6 +268,14 @@ legend([{'0.1'},{'0.3'}]);
 ylabel('Predictive Value -');
 title('SEQ');
 
+%%
+cd('/home/oshrit/Desktop/Marik_Fig/');
+h = get(0,'children');
+for i=1:length(h)
+  saveas(h(i), ['figure' num2str(i)], 'png'); %+16
+  saveas(h(i), ['figure' num2str(i)], 'fig');
+end
+
 
 %% Identified dipoles are with a distance error of:
 load pnt
@@ -325,16 +333,98 @@ deepErr_SEQ=deepErr(3:3:30,:);
 
 save numDip_distErr_deepErr numDip_* distErr_* deepErr_*
 
-%%
-cd('/home/oshrit/Desktop/Marik_Fig/');
-h = get(0,'children');
-for i=1:length(h)
-  saveas(h(i), ['figure' num2str(i)], 'png'); %+16
-  saveas(h(i), ['figure' num2str(i)], 'fig');
+
+%% For statistics
+
+% Anova Number of dipoles and distance error 
+load pnt
+Rpower=100;
+%noise(0.1,0.3)*Ndip(1:5)*distances(35mm,55mm,75mm)
+noise_count=0;
+R=cell(1,3); MED=cell(1,3); SEQ=cell(1,3);
+Ndip=1;
+
+matNum=zeros(1000,6);
+matDistErr=zeros(1000,6);
+for noiseFactor=[0.1 0.3]
+    
+    noise_count=noise_count+1;
+    load(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
+%     if Ndip==1
+%         [SEQ(Ndip,1:3)]=marikVirtual31plot_stat(input,pnt,results);
+%     else
+        [SEQ(Ndip,:)]=marikVirtual31plot_stat(input,pnt,results);
+%     end
+
+    load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])              
+%     if Ndip==1
+%         [R(Ndip,1:3),MED(Ndip,1:3)]=marikVirtual29plot_stat(input,pnt,results);
+%     else
+        [R(Ndip,:),MED(Ndip,:)]=marikVirtual29plot_stat(input,pnt,results);
+%     end
+
+    if noise_count==1;
+        matNum(:, 1)=MED{Ndip,1};
+        matNum(:, 2)=R{Ndip,1};
+        matNum(:, 3)=SEQ{Ndip,1};
+        matDistErr(:, 1)=MED{Ndip,2};
+        matDistErr(:, 2)=R{Ndip,2};
+        matDistErr(:, 3)=SEQ{Ndip,2};
+    elseif noise_count==2;
+        matNum(:, 4)=MED{Ndip,1};
+        matNum(:, 5)=R{Ndip,1};
+        matNum(:, 6)=SEQ{Ndip,1};
+        matDistErr(:, 4)=MED{Ndip,2};
+        matDistErr(:, 5)=R{Ndip,2};
+        matDistErr(:, 6)=SEQ{Ndip,2};
+    end
+      
 end
 
 
-%% For statistics
+Ndip_options=2:5;
+%noise(0.1,0.3)*Ndip(1:5)*distances(35mm,55mm,75mm)
+noise_count=0;
+R=cell(length(Ndip_options),9); MED=cell(length(Ndip_options),9); SEQ=cell(length(Ndip_options),9);
+matNum35=NaN(1000,6*4);
+matDistErr35=NaN(1000,6*4);
+vec=[0:6:6*4];
+for noiseFactor=[0.1 0.3]
+    
+    noise_count=noise_count+1;
+    for Ndip=Ndip_options;
+        load(['resultsSeq1_',num2str(Ndip),'_',num2str(noiseFactor),'.mat'])
+        [SEQ(Ndip-1,:)]=marikVirtual31plot_stat(input,pnt,results);
+        
+        load(['results1_',num2str(Ndip),'_',num2str(Rpower),'_',num2str(noiseFactor),'.mat'])
+        [R(Ndip-1,:),MED(Ndip-1,:)]=marikVirtual29plot_stat(input,pnt,results);
+        
+        if noise_count==1;
+            matNum35(1:length(MED{Ndip-1,1}{1}), vec(Ndip-1)+1)=MED{Ndip-1,1}{1};
+            matNum35(1:length(R{Ndip-1,1}{1}), vec(Ndip-1)+2)=R{Ndip-1,1}{1};
+            matNum35(1:length(SEQ{Ndip-1,1}{1}), vec(Ndip-1)+3)=SEQ{Ndip-1,1}{1};
+            matDistErr35(1:length(MED{Ndip-1,2}{1}),vec(Ndip-1)+2)=MED{Ndip-1,2}{1};
+            matDistErr35(1:length(R{Ndip-1,2}{1}), vec(Ndip-1)+2)=R{Ndip-1,2}{1};
+            matDistErr35(1:length(SEQ{Ndip-1,2}{1}), vec(Ndip-1)+3)=SEQ{Ndip-1,2}{1};
+        elseif noise_count==2;
+            matNum35(1:length(MED{Ndip-1,1}{1}), vec(Ndip-1)+4)=MED{Ndip-1,1}{1};
+            matNum35(1:length(R{Ndip-1,1}{1}), vec(Ndip-1)+5)=R{Ndip-1,1}{1};
+            matNum35(1:length(SEQ{Ndip-1,1}{1}), vec(Ndip-1)+6)=SEQ{Ndip-1,1}{1};
+            matDistErr35(1:length(MED{Ndip-1,2}{1}), vec(Ndip-1)+4)=MED{Ndip-1,2}{1};
+            matDistErr35(1:length(R{Ndip-1,2}{1}), vec(Ndip-1)+5)=R{Ndip-1,2}{1};
+            matDistErr35(1:length(SEQ{Ndip-1,2}{1}), vec(Ndip-1)+6)=SEQ{Ndip-1,2}{1};
+        end
+    end
+end
+ % SEQ R MED
+ % 4 rows - levels of number of dipoles (2,3,4,5 dipoles) 
+ % * 
+ % 9 columns - 
+ % ( [number of dipoles found] [distance error] [depth error] for distances 35(columns 1,2,3), 55(columns 4,5,6) and 75(columns 4,5,6)mm )
+ %% I can do also matNum55 matNum75 matDistErr55 matDistErr75
+ %% first ask maor if I can run Anova ??
+
+%%
 % Chi-test
 Err=25;
 noiseFactor=[0.1 0.3];
