@@ -400,13 +400,15 @@ for noiseFactor=[0.1 0.3]
         [R(Ndip-1,:),MED(Ndip-1,:)]=marikVirtual29plot_stat(input,pnt,results);
         
         if noise_count==1;
+            % dipole, noise_level, method
             matNum35(1:length(MED{Ndip-1,1}{1}), vec(Ndip-1)+1)=MED{Ndip-1,1}{1};
             matNum35(1:length(R{Ndip-1,1}{1}), vec(Ndip-1)+2)=R{Ndip-1,1}{1};
             matNum35(1:length(SEQ{Ndip-1,1}{1}), vec(Ndip-1)+3)=SEQ{Ndip-1,1}{1};
-            matDistErr35(1:length(MED{Ndip-1,2}{1}),vec(Ndip-1)+2)=MED{Ndip-1,2}{1};
+            matDistErr35(1:length(MED{Ndip-1,2}{1}),vec(Ndip-1)+1)=MED{Ndip-1,2}{1};
             matDistErr35(1:length(R{Ndip-1,2}{1}), vec(Ndip-1)+2)=R{Ndip-1,2}{1};
             matDistErr35(1:length(SEQ{Ndip-1,2}{1}), vec(Ndip-1)+3)=SEQ{Ndip-1,2}{1};
         elseif noise_count==2;
+            % dipole(4), noise_level(2), method(3)
             matNum35(1:length(MED{Ndip-1,1}{1}), vec(Ndip-1)+4)=MED{Ndip-1,1}{1};
             matNum35(1:length(R{Ndip-1,1}{1}), vec(Ndip-1)+5)=R{Ndip-1,1}{1};
             matNum35(1:length(SEQ{Ndip-1,1}{1}), vec(Ndip-1)+6)=SEQ{Ndip-1,1}{1};
@@ -422,7 +424,7 @@ end
  % 9 columns - 
  % ( [number of dipoles found] [distance error] [depth error] for distances 35(columns 1,2,3), 55(columns 4,5,6) and 75(columns 4,5,6)mm )
  %% I can do also matNum55 matNum75 matDistErr55 matDistErr75
- %% first ask maor if I can run Anova ??
+ %% first ask **Maor** if I can run Anova ??
 
 %%
 % Chi-test
