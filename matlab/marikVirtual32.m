@@ -3,16 +3,30 @@
 %% Somatosensory Marik
 load /home/yuval/epiloc/data/MHR
 cd /home/yuval/Data/marik/som2/1
-[pow,pntR]=rimda(MHR);
+[pow,pntR,current,fwdHR]=rimda(MHR);
 load /home/yuval/epiloc/data/MHL
-[pow,pntL]=rimda(MHL);
+[pow,pntL,current,fwdHL]=rimda(MHL);
 load /home/yuval/epiloc/data/MF
-[pow,pntF]=rimda(MF);
+[pow,pntF,current,fwdF]=rimda(MF);
 load /home/yuval/epiloc/data/RF
-[pow,pntRF]=rimda(RF);
+[pow,pntRF,current,fwdRF]=rimda(RF);
 load /home/yuval/epiloc/data/RFL
-[pow,pntRFL]=rimda(RFL);
+[pow,pntRFL,current,fwdRFL]=rimda(RFL);
 save /home/yuval/epiloc/data/pntiAll pnt*
+
+%% Correlations:
+cFL=corr(fwdF,fwdHL);
+cFR=corr(fwdF,fwdHR);
+cLR=corr(fwdHL,fwdHR);
+
+cMFL=corr(MF,MHL);
+cMFR=corr(MF,MHR);
+cMLR=corr(MHL,MHR);
+
+%% Distances:
+dist=norm(pnt(pntR,:)-pnt(pntRF(2),:),2);
+% dist=norm(pnt(pntR,:)-pnt(pntRF(1),:),2)
+
 
 %% Auditory Marik
 cd /home/yuval/Data/marik/marikAud
@@ -40,7 +54,7 @@ MYF=avg1_footL.avg(:,RLF(3));
 [pow,pntYF,current,fwdYF]=rimda(MYF);
 % Hand R + foot
 MYRF=avg1_handR.avg(:,RLF(1))+avg1_footL.avg(:,RLF(3));
-% figure;topoplot248(MYHR);
+% figure;topoplot248(MYRF);
 [pow,pntYRF,current]=rimda(MYRF);
 % Hand R + Hand L + foot
 MYRFL=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3));
@@ -56,7 +70,7 @@ MYRFL=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3))
 %   -14.3983  -13.4400  106.7133
 save /home/yuval/epiloc/data/pntYiAll pntY*
 
-%% What is the correlation between HR and F??
+%% Correlations:
 cYFL=corr(fwdYF,fwdYHL);
 cYFR=corr(fwdYF,fwdYHR);
 cYLR=corr(fwdYHL,fwdYHR);
@@ -64,6 +78,13 @@ cYLR=corr(fwdYHL,fwdYHR);
 % cYFR =   0.0946
 % cYLR =  -0.1798
 save /home/yuval/epiloc/data/corrY cY* fwdY*
+MYLF=avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3));
+% figure;topoplot248(MYLF);
+[pow,pntYLF,current]=rimda(MYLF);
+%% High diff in intensity:
+figure;topoplot248(MYF);caxis([-0.26 0.44]*10^-12);
+figure;topoplot248(MYHL);caxis([-0.26 0.44]*10^-12);
+figure;topoplot248(MYHR);caxis([-0.26 0.44]*10^-12);
 
 
 %% Auditory Yuval
@@ -74,8 +95,7 @@ MY=avgSt.avg(:,394);
 % figure; topoplot248(MY);
 [pow,pntYAud,current]=rimda(MY);
 save /home/yuval/epiloc/data/pntYAud pntYAud
-
-MY=avgSt.avg(:,438);
+%MY=avgSt.avg(:,438);
 
 
 %%
@@ -84,5 +104,5 @@ load pntiAll
 load pntSom
 %AIR order 
 x=num2str(-pnt(pntR,1));y=num2str(pnt(pntR,3));z=num2str(pnt(pntR,2));
-[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(9-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix R3'])
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(9-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix R4'])
 afni
