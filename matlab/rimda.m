@@ -1,4 +1,4 @@
-function PowCur=rimda(M)
+function [PowCur,pnti,current,fwd]=rimda(M)
 
 N=10000;
 
