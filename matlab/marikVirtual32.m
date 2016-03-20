@@ -98,11 +98,54 @@ save /home/yuval/epiloc/data/pntYAud pntYAud
 %MY=avgSt.avg(:,438);
 
 
-%%
+%% write sphere dipole to BRIK
 cd /home/yuval/epiloc/data
+%% Somatosensory
+% Marik
 load pntiAll
 load pntSom
 %AIR order 
 x=num2str(-pnt(pntR,1));y=num2str(pnt(pntR,3));z=num2str(pnt(pntR,2));
-[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(9-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix R4'])
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix R'])
 afni
+
+x=num2str(-pnt(pntL,1));y=num2str(pnt(pntL,3));z=num2str(pnt(pntL,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix L'])
+
+x=num2str(-pnt(pntF,1));y=num2str(pnt(pntF,3));z=num2str(pnt(pntF,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix F'])
+for ii=1:2
+    x=num2str(-pnt(pntRF(ii),1));y=num2str(pnt(pntRF(ii),3));z=num2str(pnt(pntRF(ii),2));
+    [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix RF',num2str(ii)])
+end
+[~,w]=afnix('3dcalc -a RF1+orig -b RF2+orig -exp "a+b" -prefix RF')
+for ii=1:3
+    x=num2str(-pnt(pntRFL(ii),1));y=num2str(pnt(pntRFL(ii),3));z=num2str(pnt(pntRFL(ii),2));
+    [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix RFL',num2str(ii)])
+end
+[~,w]=afnix('3dcalc -a RFL1+orig -b RFL2+orig -c RFL3+orig -exp "a+b+c" -prefix RFL')
+
+% Yuval
+load('/home/yuval/epiloc/data/yuvSom/pnt.mat')
+load pntYiAll
+x=num2str(-pnt(pntYHR,1));y=num2str(pnt(pntYHR,3));z=num2str(pnt(pntYHR,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix RY'])
+% afni
+
+x=num2str(-pnt(pntYHL,1));y=num2str(pnt(pntYHL,3));z=num2str(pnt(pntYHL,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YL'])
+
+x=num2str(-pnt(pntYF,1));y=num2str(pnt(pntYF,3));z=num2str(pnt(pntYF,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YF'])
+for ii=1:1 % not 2
+    x=num2str(-pnt(pntYRF(ii),1));y=num2str(pnt(pntYRF(ii),3));z=num2str(pnt(pntYRF(ii),2));
+    [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YRF',num2str(ii)])
+end
+[~,w]=afnix('3dcalc -a YRF1+orig -b YRF2+orig -exp "a+b" -prefix YRF')
+for ii=1:3
+    x=num2str(-pnt(pntYRFL(ii),1));y=num2str(pnt(pntYRFL(ii),3));z=num2str(pnt(pntYRFL(ii),2));
+    [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YRFL',num2str(ii)])
+end
+[~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -c YRFL3+orig -exp "a+b+c" -prefix YRFL')
+
+%% Auditory

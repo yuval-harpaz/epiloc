@@ -1,8 +1,8 @@
 
 type = string-attribute
 name = HISTORY_NOTE
-count = 608
-'[yuval@meg2: Thu May 21 20:55:13 2015] to3d MR000000 MR000001 MR000002 ... MR000161 MR000162\n[yuval@meg2: Mon Oct 19 14:40:39 2015] 3dTagalign -master /home/yuval/brainhull/master+orig -prefix ./ortho anat+orig\n[yuval@meg2: Mon Oct 19 14:44:55 2015] plug_nudge: -rotate   1.00I  -5.00R   0.09A  -ashift   0.00S   5.82L -10.10P\n[yuval@meg2: Mon Oct 19 14:49:51 2015] plug_nudge: -rotate  -2.51I   0.17R   5.00A  -ashift   0.00S   0.07L   2.00P\n[yuval@meg2: Tue Mar 15 16:54:14 2016] 3dcalc -a ortho+orig -exp 'step(9-(x--40.1601)*(x--40.1601)-(y--25.1877)*(y--25.1877)-(z-72.6828)*(z-72.6828))' -prefix R~
+count = 603
+'[yuval@meg2: Thu May 21 20:55:13 2015] to3d MR000000 MR000001 MR000002 ... MR000161 MR000162\n[yuval@meg2: Mon Oct 19 14:40:39 2015] 3dTagalign -master /home/yuval/brainhull/master+orig -prefix ./ortho anat+orig\n[yuval@meg2: Mon Oct 19 14:44:55 2015] plug_nudge: -rotate   1.00I  -5.00R   0.09A  -ashift   0.00S   5.82L -10.10P\n[yuval@meg2: Mon Oct 19 14:49:51 2015] plug_nudge: -rotate  -2.51I   0.17R   5.00A  -ashift   0.00S   0.07L   2.00P\n[yuval@meg2: Sun Mar 20 13:05:39 2016] 3dcalc -a ortho+orig -exp 'step(25-(x--8.405)*(x--8.405)-(y-83.1331)*(y-83.1331)-(z-40.6911)*(z-40.6911))' -prefix R~
 
 type = string-attribute
 name = TYPESTRING
@@ -12,12 +12,12 @@ count = 15
 type = string-attribute
 name = IDCODE_STRING
 count = 27
-'XYZ_fD83BZSTCxVJzIhcg2WcoA~
+'XYZ_qDYnD457EHxFGY22hrahsg~
 
 type = string-attribute
 name = IDCODE_DATE
 count = 25
-'Tue Mar 15 16:54:14 2016~
+'Sun Mar 20 13:05:39 2016~
 
 type = integer-attribute
 name = SCENE_DATA
