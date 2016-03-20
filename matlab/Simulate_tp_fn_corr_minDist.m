@@ -1,6 +1,10 @@
 function [pairCorr,pairCorrR, pairCorrS, his, hisR, hisS]=Simulate_tp_fn_corr_minDist(noiseFactor)
 Rpower=100;
 minDist=25;
+Ndip_options=2:5;
+his=cell(length(Ndip_options),1);
+hisR=cell(length(Ndip_options),1);
+hisS=cell(length(Ndip_options),1);
 for Ndip=2:5;
     
     load pnt
@@ -68,10 +72,10 @@ for Ndip=2:5;
     %     avg=histc(pairCorr{Ndip}(:,1),[0:0.05:1]);
     stepi=2/7;
     bins=[-1:stepi:1];
-    his=NaN(length(bins)-1,1);
-    for bini=1:length(his)
+    his{Ndip-1}=NaN(length(bins)-1,1);
+    for bini=1:length(his{Ndip-1})
         linei=pairCorr{Ndip}(:,1)>=bins(bini) & pairCorr{Ndip}(:,1)<bins(bini+1);
-        his(bini)=mean(pairCorr{Ndip}(linei,2));
+        his{Ndip-1}(bini)=mean(pairCorr{Ndip}(linei,2));
     end
     %     for jj=1:length(pairCorr{Ndip}(:,1))
 %     b=pairCorr{Ndip}(:,1)./stepi;
@@ -84,11 +88,11 @@ for Ndip=2:5;
 %         his(bi)=mean(pairCorr{Ndip}(bii,2));
 %     end
     
-    hisR=NaN(length(bins)-1,1);
+    hisR{Ndip-1}=NaN(length(bins)-1,1);
     %     for jj=1:length(pairCorr{Ndip}(:,1))
-    for bini=1:length(his)
+    for bini=1:length(his{Ndip-1})
         linei=pairCorrR{Ndip}(:,1)>=bins(bini) & pairCorrR{Ndip}(:,1)<bins(bini+1);
-        hisR(bini)=mean(pairCorrR{Ndip}(linei,2));
+        hisR{Ndip-1}(bini)=mean(pairCorrR{Ndip}(linei,2));
     end
   
     
@@ -123,17 +127,17 @@ for Ndip=2:5;
         
     end
     %     avg=histc(pairCorr{Ndip}(:,1),[0:0.05:1]);
-    hisS=NaN(length(bins)-1,1);
-    for bini=1:length(his)
+    hisS{Ndip-1}=NaN(length(bins)-1,1);
+    for bini=1:length(his{Ndip-1})
         linei=pairCorrS{Ndip}(:,1)>=bins(bini) & pairCorrS{Ndip}(:,1)<bins(bini+1);
-        hisS(bini)=mean(pairCorrS{Ndip}(linei,2));
+        hisS{Ndip-1}(bini)=mean(pairCorrS{Ndip}(linei,2));
     end
      
     figure;
-    plot(bins(1:end-1)+stepi/2,his, 'r*-');
+    plot(bins(1:end-1)+stepi/2,his{Ndip-1}, 'r*-');
     hold on;
-    plot(bins(1:end-1)+stepi/2,hisR, 'bo-');     
-    plot(bins(1:end-1)+stepi/2,hisS, 'gd-');
+    plot(bins(1:end-1)+stepi/2,hisR{Ndip-1}, 'bo-');     
+    plot(bins(1:end-1)+stepi/2,hisS{Ndip-1}, 'gd-');
     ylim([0 1]);
     ylabel('fraction of dipoles identified from each pair');
     xlabel('correlation between the fields of each pair of dipoles');
