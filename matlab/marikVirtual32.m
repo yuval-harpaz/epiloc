@@ -161,11 +161,13 @@ end
 
 %% Auditory
 % Marik
+load /home/yuval/Data/marik/marikAud/pnt
 load /home/yuval/epiloc/data/pntAud
 x=num2str(-pnt(pntAud,1));y=num2str(pnt(pntAud,3));z=num2str(pnt(pntAud,2));
 [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix Aud'])
 
 % Yuval
+load /home/yuval/Data/marik/yuval/4/pnt
 load /home/yuval/epiloc/data/pntYAud
 x=num2str(-pnt(pntYAud,1));y=num2str(pnt(pntYAud,3));z=num2str(pnt(pntYAud,2));
 [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud'])
