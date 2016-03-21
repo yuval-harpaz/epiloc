@@ -2,7 +2,7 @@
 type = string-attribute
 name = HISTORY_NOTE
 count = 664
-'[yuval@yuval-HP: Wed Oct 12 16:50:59 2011] Dataset Copy {Input: Dataset=./s027963057-0003-00001-000001-01.hdr+orig.HEAD} {Output: Prefix=anat}\n[yuval@yuval-HP: Wed Oct 12 17:06:52 2011] 3dTagalign -prefix ./ortho -master /home/yuval/brainhull/master+orig anat+orig\n[yuval@yuval-HP: Wed Oct 12 17:19:31 2011] plug_nudge: -rotate   0.00I  -4.00R   0.00A  -ashift   0.00S   0.00L  -6.00P\n[yuval@meg2: Sun Mar 20 14:16:47 2016] plug_nudge: -rotate  -3.00I   0.00R   0.00A  -ashift  -4.00S  -1.84L  -3.00P\n[yuval@meg2: Sun Mar 20 14:19:35 2016] 3dcalc -a ortho+orig -exp 'step(25-(x-8.1466)*(x-8.1466)-(y-88.9083)*(y-88.9083)-(z-29.4913)*(z-29.4913))' -prefix YRF1~
+'[yuval@yuval-HP: Wed Oct 12 16:50:59 2011] Dataset Copy {Input: Dataset=./s027963057-0003-00001-000001-01.hdr+orig.HEAD} {Output: Prefix=anat}\n[yuval@yuval-HP: Wed Oct 12 17:06:52 2011] 3dTagalign -prefix ./ortho -master /home/yuval/brainhull/master+orig anat+orig\n[yuval@yuval-HP: Wed Oct 12 17:19:31 2011] plug_nudge: -rotate   0.00I  -4.00R   0.00A  -ashift   0.00S   0.00L  -6.00P\n[yuval@meg2: Sun Mar 20 14:16:47 2016] plug_nudge: -rotate  -3.00I   0.00R   0.00A  -ashift  -4.00S  -1.84L  -3.00P\n[yuval@meg2: Mon Mar 21 15:22:29 2016] 3dcalc -a ortho+orig -exp 'step(25-(x-3.3202)*(x-3.3202)-(y-85.1601)*(y-85.1601)-(z-36.0627)*(z-36.0627))' -prefix YRF1~
 
 type = string-attribute
 name = TYPESTRING
@@ -12,12 +12,12 @@ count = 15
 type = string-attribute
 name = IDCODE_STRING
 count = 27
-'XYZ_GNcN-0xRyCJT6VGRpfyMEw~
+'XYZ_YDuC21FTreCYH7ET7z7IcQ~
 
 type = string-attribute
 name = IDCODE_DATE
 count = 25
-'Sun Mar 20 14:19:35 2016~
+'Mon Mar 21 15:22:29 2016~
 
 type = integer-attribute
 name = SCENE_DATA
