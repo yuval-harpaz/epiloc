@@ -178,8 +178,9 @@ cd /home/yuval/epiloc/data/
 load pntYAud
 % for ii=1:2
 %     x=num2str(-pnt(pntYAud(ii),1));y=num2str(pnt(pntYAud(ii),3));z=num2str(pnt(pntYAud(ii),2));
-%     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud',num2str(ii)])
+%     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud3_',num2str(ii)])
 % end
+% [~,w]=afnix('3dcalc -a YAud3_1+orig -b YAud3_2+orig -exp "a+b" -prefix YAud3')
 % load pntYAud_temp
 % pntYAud=pntYAud_385;
 % pntYAud=pntYAud_385_2;
