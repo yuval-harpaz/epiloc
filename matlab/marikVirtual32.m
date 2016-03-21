@@ -162,6 +162,7 @@ end
 % [~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -c YRFL3+orig -exp "a+b+c" -prefix YRFL')
 [~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -exp "a+b" -prefix YRFL')
 
+
 %% Auditory
 % Marik
 load /home/yuval/Data/marik/marikAud/pnt
@@ -190,8 +191,6 @@ x=num2str(-pnt(pntYAud,1));y=num2str(pnt(pntYAud,3));z=num2str(pnt(pntYAud,2));
    
 %% 
 % 3dcalc -a R+orig -b F+orig -c L+orig -d RFL+orig -exp "a+b+c+2*d" -prefix RFLRFL
-
-
 
 cd /home/yuval/epiloc/data/
 % cd /home/oshrit/MyDocuments/DATA/Marik/epiloc/data
@@ -239,3 +238,12 @@ MY=avgSt.avg(:,385); %394
 figure; topoplot248(MY);
 caxis([-1.2.*10^-13 1.5*10^-13])
 
+hs=ft_read_headshape('/home/oshrit/MyDocuments/DATA/Marik/epiloc/data/yuvSom/hs_file');
+pnti=726;
+figure;
+plot3pnt(hs,'.k');
+hold on
+scatter3pnt(pnt(pnti,:),25,[1 0 0])
+scatter3pnt(pnt,1,[1 1 1])
+colorbar off
+rotate3d on
