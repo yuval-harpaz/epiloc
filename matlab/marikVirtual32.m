@@ -101,7 +101,7 @@ figure;topoplot248(MYHR);caxis([-0.26 0.44]*10^-12);
 cd /home/yuval/Data/marik/yuval/4
 load avgSt.mat
 % figure; plot(avgSt.avg');
-MY=avgSt.avg(:,394);
+MY=avgSt.avg(:,385); 
 % figure; topoplot248(MY);
 [pow,pntYAud,current]=rimda(MY);
 save /home/yuval/epiloc/data/pntYAud pntYAud
@@ -176,11 +176,17 @@ end
 load /home/yuval/Data/marik/yuval/4/pnt
 cd /home/yuval/epiloc/data/
 load pntYAud
-for ii=1:2
-    x=num2str(-pnt(pntYAud(ii),1));y=num2str(pnt(pntYAud(ii),3));z=num2str(pnt(pntYAud(ii),2));
-    [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud',num2str(ii)])
-end
+% for ii=1:2
+%     x=num2str(-pnt(pntYAud(ii),1));y=num2str(pnt(pntYAud(ii),3));z=num2str(pnt(pntYAud(ii),2));
+%     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud',num2str(ii)])
+% end
+% load pntYAud_temp
+% pntYAud=pntYAud_385;
+% pntYAud=pntYAud_385_2;
+x=num2str(-pnt(pntYAud,1));y=num2str(pnt(pntYAud,3));z=num2str(pnt(pntYAud,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud']); % 2
 
+   
 %% 
 % 3dcalc -a R+orig -b F+orig -c L+orig -d RFL+orig -exp "a+b+c+2*d" -prefix RFLRFL
 
@@ -228,7 +234,7 @@ caxis([-1.2*10^-13 1.0*10^-13])
 cd /home/yuval/Data/marik/yuval/4
 load avgSt.mat
 % load /home/oshrit/MyDocuments/DATA/Marik/epiloc/data/In_Afni/Yuval/Aud/avgSt.mat
-MY=avgSt.avg(:,394);
+MY=avgSt.avg(:,385); %394
 figure; topoplot248(MY);
-caxis([-1.*10^-13 1.2*10^-13])
+caxis([-1.2.*10^-13 1.5*10^-13])
 
