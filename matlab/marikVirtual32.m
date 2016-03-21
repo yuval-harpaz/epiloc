@@ -68,6 +68,16 @@ MYRFL=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3))
 %    -8.1466   29.4913   88.9083
 % pnt(308,:)
 %   -14.3983  -13.4400  106.7133
+% dist=norm(pnt(769,:)-pnt(611,:),2);
+%%
+% % Hand R + foot
+% MYR2F=avg1_handR.avg(:,RLF(1))+2*avg1_footL.avg(:,RLF(3));
+% % figure;topoplot248(MYRF);
+% [pow,pntYR2F,current]=rimda(MYR2F);
+% % Hand L + foot
+% MYL2F=avg1_handL.avg(:,RLF(2))+2*avg1_footL.avg(:,RLF(3));
+% % figure;topoplot248(MYL2F);
+% [pow,pntYL2F,current]=rimda(MYL2F);
 save /home/yuval/epiloc/data/pntYiAll pntY*
 
 %% Correlations:
@@ -124,6 +134,7 @@ for ii=1:3
     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix RFL',num2str(ii)])
 end
 [~,w]=afnix('3dcalc -a RFL1+orig -b RFL2+orig -c RFL3+orig -exp "a+b+c" -prefix RFL')
+% [~,w]=afnix('3dcalc -a R+orig -b F+orig -c L+orig -d RFL+orig -exp "a+b+c+d" -prefix RFLRFL')
 
 % Yuval
 load('/home/yuval/epiloc/data/yuvSom/pnt.mat')
@@ -149,3 +160,12 @@ end
 [~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -c YRFL3+orig -exp "a+b+c" -prefix YRFL')
 
 %% Auditory
+% Marik
+load /home/yuval/epiloc/data/pntAud
+x=num2str(-pnt(pntAud,1));y=num2str(pnt(pntAud,3));z=num2str(pnt(pntAud,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix Aud'])
+
+% Yuval
+load /home/yuval/epiloc/data/pntYAud
+x=num2str(-pnt(pntYAud,1));y=num2str(pnt(pntYAud,3));z=num2str(pnt(pntYAud,2));
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud'])
