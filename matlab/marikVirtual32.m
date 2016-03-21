@@ -140,7 +140,7 @@ end
 load('/home/yuval/epiloc/data/yuvSom/pnt.mat')
 load pntYiAll
 x=num2str(-pnt(pntYHR,1));y=num2str(pnt(pntYHR,3));z=num2str(pnt(pntYHR,2));
-[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix RY'])
+[~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YR'])
 % afni
 
 x=num2str(-pnt(pntYHL,1));y=num2str(pnt(pntYHL,3));z=num2str(pnt(pntYHL,2));
@@ -148,16 +148,19 @@ x=num2str(-pnt(pntYHL,1));y=num2str(pnt(pntYHL,3));z=num2str(pnt(pntYHL,2));
 
 x=num2str(-pnt(pntYF,1));y=num2str(pnt(pntYF,3));z=num2str(pnt(pntYF,2));
 [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YF'])
+
 for ii=1:1 % not 2
     x=num2str(-pnt(pntYRF(ii),1));y=num2str(pnt(pntYRF(ii),3));z=num2str(pnt(pntYRF(ii),2));
     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YRF',num2str(ii)])
 end
-[~,w]=afnix('3dcalc -a YRF1+orig -b YRF2+orig -exp "a+b" -prefix YRF')
-for ii=1:3
+% [~,w]=afnix('3dcalc -a YRF1+orig -b YRF2+orig -exp "a+b" -prefix YRF')
+
+for ii=1:2 % not 3
     x=num2str(-pnt(pntYRFL(ii),1));y=num2str(pnt(pntYRFL(ii),3));z=num2str(pnt(pntYRFL(ii),2));
     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YRFL',num2str(ii)])
 end
-[~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -c YRFL3+orig -exp "a+b+c" -prefix YRFL')
+% [~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -c YRFL3+orig -exp "a+b+c" -prefix YRFL')
+[~,w]=afnix('3dcalc -a YRFL1+orig -b YRFL2+orig -exp "a+b" -prefix YRFL')
 
 %% Auditory
 % Marik
@@ -177,3 +180,55 @@ for ii=1:2
     x=num2str(-pnt(pntYAud(ii),1));y=num2str(pnt(pntYAud(ii),3));z=num2str(pnt(pntYAud(ii),2));
     [~,w]=afnix(['3dcalc -a ortho+orig -exp "step(25-(x-',x,')*(x-',x,')-(y-',y,')*(y-',y,')-(z-',z,')*(z-',z,'))" -prefix YAud',num2str(ii)])
 end
+
+%% 
+% 3dcalc -a R+orig -b F+orig -c L+orig -d RFL+orig -exp "a+b+c+2*d" -prefix RFLRFL
+
+
+
+cd /home/yuval/epiloc/data/
+% cd /home/oshrit/MyDocuments/DATA/Marik/epiloc/data
+load('MHR.mat')
+figure; topoplot248(MHR);
+caxis([-1.2*10^-13 1.0*10^-13])
+load('MHL.mat')
+figure; topoplot248(MHL);
+caxis([-1.2*10^-13 1.0*10^-13])
+load('MF.mat')
+figure; topoplot248(MF);
+caxis([-1.2*10^-13 1.0*10^-13])
+load('RFL.mat')
+figure; topoplot248(RFL);
+caxis([-1.2*10^-13 1.0*10^-13])
+
+cd /home/yuval/epiloc/data/yuvSom
+load avgFilt
+% load /home/oshrit/MyDocuments/DATA/Marik/epiloc/data/yuvSom/avgFilt
+RLF=[152,157,300];
+MYHR=avg1_handR.avg(:,RLF(1));
+MYHL=avg1_handL.avg(:,RLF(2));
+MYF=avg1_footL.avg(:,RLF(3));
+MYRFL=avg1_handR.avg(:,RLF(1))+avg1_handL.avg(:,RLF(2))+avg1_footL.avg(:,RLF(3));
+figure; topoplot248(MYHR);
+caxis([-2.6*10^-13 4.3*10^-13])
+figure; topoplot248(MYHL);
+caxis([-2.6*10^-13 4.3*10^-13])
+figure; topoplot248(MYF);
+caxis([-2.6*10^-13 4.3*10^-13])
+figure; topoplot248(MYRFL);
+caxis([-2.6*10^-13 4.3*10^-13])
+
+cd /home/yuval/Data/marik/marikAud
+load avgSt.mat
+% load /home/oshrit/MyDocuments/DATA/Marik/epiloc/data/In_Afni/Marik/Aud/avgSt.mat
+M=avgSt.avg(:,353);
+figure; topoplot248(M);
+caxis([-1.2*10^-13 1.0*10^-13])
+
+cd /home/yuval/Data/marik/yuval/4
+load avgSt.mat
+% load /home/oshrit/MyDocuments/DATA/Marik/epiloc/data/In_Afni/Yuval/Aud/avgSt.mat
+MY=avgSt.avg(:,394);
+figure; topoplot248(MY);
+caxis([-1.*10^-13 1.2*10^-13])
+
